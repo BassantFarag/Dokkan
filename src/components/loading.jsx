@@ -719,7 +719,7 @@ const Loading = () => {
                 ease: "easeInOut",
             }}
             >
-            Setting everything up for you...
+            Setting everything up for you.....
             </motion.p>
 
             {/* ================= 4. THREE GLOWING BOUNCING DOTS ================= */}
