@@ -2,14 +2,15 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Mail, Phone, Globe, Share2, MessageCircle, Send, Flashlight, ShoppingBag, Sparkles } from "lucide-react";
+import Logo from "../components/Logo";
 
 export default function LuxuryFooter() {
   const footerNavLinks = [
     { label: "Home", path: "/" },
     { label: "Shop", path: "shop" },
-    { label: "Wishlist", path: "Whishlist" },
     { label: "My Orders", path: "Myorders" },
     { label: "Carts", path: "Carts" },
+    { label: "Wishlist", path: "Whishlist" },
   ];
 
   return (
@@ -35,13 +36,11 @@ export default function LuxuryFooter() {
           
         
           <div className="space-y-4">
-            <NavLink to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#c2a38e] text-zinc-950 font-bold shadow-md">
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M2 10v4M6 6v12M10 3v18M14 8v8M18 5v14M22 10v4" />
-                </svg>
-              </div>
-              <span className="text-xl font-extrabold tracking-tight text-[#f3ece7]">Dokkan</span>
+            {/* Footer is always on the dark palette, so the "dark" wrapper
+                forces the logo's dark-mode colors regardless of the site's
+                current theme toggle. */}
+            <NavLink to="/" className="dark flex items-center">
+              <Logo markClassName="h-10" textClassName="h-6" />
             </NavLink>
             <p className="text-xs text-[#a0948c] leading-relaxed">
               Warning: Browsing our collection may cause extreme happiness and heavy carts.
@@ -70,7 +69,7 @@ export default function LuxuryFooter() {
                             className="relative flex items-center pr-1"
                             transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
                           >
-                            <Flashlight className="h-4 w-4 text-[#c2a38e] -rotate-45 drop-shadow-[0_0_8px_#c2a38e]" />
+                            <Flashlight className="h-4 w-4 text-[#c2a38e] rotate-45 drop-shadow-[0_0_8px_#c2a38e]" />
                             <div
                               className="absolute left-3 w-16 h-6 pointer-events-none opacity-80 z-0"
                               style={{

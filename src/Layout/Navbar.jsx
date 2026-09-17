@@ -3,13 +3,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Sun, Moon, Menu, X, ArrowUpRight , User} from "lucide-react";
 import { NavLink, useLocation , useNavigate} from "react-router-dom";
 import UserHeader from "./UserHeader";
+import { useAuth } from "../context/AuthContext";
+import { logout as logoutApi } from "../api/authApi";
+import Logo from "../components/Logo";
 
 
 export default function LuxuryHeader() {
   const [isDark, setIsDark] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { isLoggedIn, user, logoutUser } = useAuth();
   const location = useLocation();
   const navigate =useNavigate();
  
@@ -21,16 +24,13 @@ export default function LuxuryHeader() {
     { label: "Wishlist", path: "/Whishlist" },
   ];
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setIsLoggedIn(true);
+  const handleLogout = async () => {
+    try {
+      await logoutApi();
+    } catch {
+      // even if the request fails, still clear the local session
     }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
+    logoutUser();
     navigate("/login");
   };
 
@@ -65,15 +65,8 @@ export default function LuxuryHeader() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6">
         
         {/* Brand Logo */}
-        <NavLink to="/" className="flex items-center gap-2 cursor-pointer">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#c2a38e] text-zinc-950 font-bold shadow-md">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M2 10v4M6 6v12M10 3v18M14 8v8M18 5v14M22 10v4" />
-            </svg>
-          </div>
-          <span className="text-xl font-extrabold tracking-tight text-[#2a2421] dark:text-[#f3ece7] transition-colors">
-            Dokkan
-          </span>
+        <NavLink to="/" className="flex items-center cursor-pointer">
+          <Logo markClassName="h-10" textClassName="h-6" />
         </NavLink>
 
       
@@ -140,7 +133,7 @@ export default function LuxuryHeader() {
 
           {/* user profile and login */}
           {isLoggedIn ? (
-            <UserHeader onLogout={handleLogout} />
+            <UserHeader user={user} onLogout={handleLogout} />
           ) : (
             <button
               className="group flex items-center gap-2 rounded-full bg-[#2a2421] px-5 py-2.5 text-xs font-medium text-[#f7f2ed] hover:bg-[#423935] dark:bg-[#f3ece7] dark:text-[#1a1513] dark:hover:bg-[#e4dcd5] transition-all shadow-md"
@@ -192,10 +185,29 @@ export default function LuxuryHeader() {
                   {link.label}
                 </NavLink>
               ))}
-              <button className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-[#2a2421] py-3 text-xs font-semibold text-[#f7f2ed] dark:bg-[#f3ece7] dark:text-[#1a1513]">
-                <span>Login</span>
-                <User className="h-4 w-4" />
-              </button>
+              {isLoggedIn ? (
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-[#2a2421] py-3 text-xs font-semibold text-[#f7f2ed] dark:bg-[#f3ece7] dark:text-[#1a1513]"
+                >
+                  <span>Logout</span>
+                  <User className="h-4 w-4" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    navigate("/login");
+                  }}
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-[#2a2421] py-3 text-xs font-semibold text-[#f7f2ed] dark:bg-[#f3ece7] dark:text-[#1a1513]"
+                >
+                  <span>Login</span>
+                  <User className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </motion.div>
         )}
