@@ -1,9 +1,8 @@
-import React from 'react'
+import React from "react";
 
+// Intentionally left empty for now.
 const Shop = () => {
-  return (
-    <div>Shop</div>
-  )
-}
+  return <div className="min-h-screen pt-32" />;
+};
 
-export default Shop
+export default Shop;
