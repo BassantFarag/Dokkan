@@ -4,8 +4,14 @@ import Home from "../Pages/Home";
 import Carts from '../Pages/Carts';
 import Whishlist from '../Pages/Whishlist';
 import Myorders from '../Pages/Myorders';
+import Profile from '../Pages/Profile';
 import Shop from '../Pages/Shop';
+import Login from '../Pages/Login';
+import Register from '../Pages/Register';
+import ForgotPassword from '../Pages/ForgotPassword';
 import Notfound from "../Pages/Notfound";
+import ProtectedRoute from "../components/ProtectedRoute";
+import GuestRoute from "../components/GuestRoute";
 
 export const routes = createBrowserRouter([{
     path:'/',
@@ -22,18 +28,60 @@ export const routes = createBrowserRouter([{
         },
         {
             path:"Myorders",
-            element:<Myorders />
+            element:(
+                <ProtectedRoute>
+                    <Myorders />
+                </ProtectedRoute>
+            )
+        },
+        {
+            path:"profile",
+            element:(
+                <ProtectedRoute>
+                    <Profile />
+                </ProtectedRoute>
+            )
         },
         {
             path:"Whishlist",
-            element:<Whishlist />
+            element:(
+                <ProtectedRoute>
+                    <Whishlist />
+                </ProtectedRoute>
+            )
         },
         {
             path:"Carts",
-            element:<Carts />
+            element:(
+                <ProtectedRoute>
+                    <Carts />
+                </ProtectedRoute>
+            )
         },
-
+        {
+            path:"login",
+            element:(
+                <GuestRoute>
+                    <Login />
+                </GuestRoute>
+            )
+        },
+        {
+            path:"register",
+            element:(
+                <GuestRoute>
+                    <Register />
+                </GuestRoute>
+            )
+        },
+        {
+            path:"forgot-password",
+            element:(
+                <GuestRoute>
+                    <ForgotPassword />
+                </GuestRoute>
+            )
+        },
 
     ]
 }])
-
