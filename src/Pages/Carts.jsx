@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Trash2,
@@ -22,15 +23,14 @@ import {
 const TAX_RATE = 0.14;
 const FREE_SHIPPING_THRESHOLD = 1000;
 const SHIPPING_FEE = 50;
-const getProduct = (item) => item.product || item.item || item;
-const getId = (item) => getProduct(item)._id || getProduct(item).id || item.productId;
-const getQty = (item) => item.quantity ?? item.qty ?? 1;
+
+
+const getProduct = (item) => item?.item || item?.product || item || {};
+const getId = (item) => getProduct(item)._id || item?._id;
+const getQty = (item) => item?.quantity ?? 1;
 const getPrice = (item) => getProduct(item).price ?? 0;
-const getName = (item) => getProduct(item).name ?? getProduct(item).title ?? "Product";
-const getImage = (item) =>
-  getProduct(item).image ||
-  getProduct(item).thumbnail ||
-  (Array.isArray(getProduct(item).images) ? getProduct(item).images[0] : null);
+const getName = (item) => getProduct(item).name ?? "Product";
+const getImage = (item) => getProduct(item).image || null;
 
 export default function Cart() {
   const navigate = useNavigate();
@@ -49,8 +49,8 @@ export default function Cart() {
     try {
       setError("");
       const res = await getMyCart();
-      const data = res.data?.cart ?? res.data?.data ?? res.data ?? {};
-      const cartItems = data.items ?? data.products ?? [];
+      const data = res.data ?? {};
+      const cartItems = data.items ?? [];
       setItems(Array.isArray(cartItems) ? cartItems : []);
       if (data.coupon) setCouponInfo(data.coupon);
     } catch (err) {
@@ -80,14 +80,19 @@ export default function Cart() {
     const id = getId(item);
     if (nextQty < 1 || updatingId) return;
     setUpdatingId(id);
+    
+    // تحديث التغيير محلياً مع الحفاظ على هيكل الكائن
     setItems((prev) =>
       prev.map((it) => (getId(it) === id ? { ...it, quantity: nextQty } : it))
     );
+
     try {
       await updateItemQuantity({ productId: id, quantity: nextQty });
     } catch (err) {
-      setError(err?.response?.data?.message || "Couldn't update quantity.");
-      fetchCart();
+      const msg = err?.response?.data?.message || "Couldn't update quantity.";
+      setError(msg);
+      toast.error(msg);
+      fetchCart(); 
     } finally {
       setUpdatingId(null);
     }
@@ -99,8 +104,11 @@ export default function Cart() {
     try {
       await removeItemFromCart(id);
       setItems((prev) => prev.filter((it) => getId(it) !== id));
+      toast.info("Item removed from cart");
     } catch (err) {
-      setError(err?.response?.data?.message || "Couldn't remove this item.");
+      const msg = err?.response?.data?.message || "Couldn't remove this item.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setUpdatingId(null);
     }
@@ -109,14 +117,24 @@ export default function Cart() {
   const handleApplyCoupon = async (e) => {
     e.preventDefault();
     if (!coupon.trim()) return;
+    
     setCouponLoading(true);
     setCouponError("");
+    
     try {
       const res = await applyCoupon({ code: coupon.trim() });
-      const data = res.data?.cart ?? res.data?.data ?? res.data ?? {};
-      setCouponInfo(data.coupon ?? { code: coupon.trim(), discount: data.discount ?? 0 });
+      const data = res.data ?? {};
+      
+      setCouponInfo({
+        code: data.coupon || coupon.trim(),
+        discount: data.discountAmount ?? 0,
+      });
+      toast.success(data.message || "Coupon applied successfully!");
+      setCoupon("");
     } catch (err) {
-      setCouponError(err?.response?.data?.message || "That code didn't work.");
+      const msg = err?.response?.data?.message || "That code didn't work.";
+      setCouponError(msg);
+      toast.error(msg);
     } finally {
       setCouponLoading(false);
     }
@@ -124,12 +142,18 @@ export default function Cart() {
 
   const handleRemoveCoupon = async () => {
     try {
-      await removeCoupon();
-    } catch {
-    } finally {
+      const res = await removeCoupon();
+      const data = res.data ?? {};
+
       setCouponInfo(null);
       setCoupon("");
-    }
+
+      toast.success(data.message || "Coupon removed successfully!");
+      fetchCart();
+    } catch (err) {
+      const msg = err?.response?.data?.message || "Couldn't remove coupon.";
+      toast.error(msg);
+    } 
   };
 
   const format = (n) => `EGP ${Math.round(n).toLocaleString()}`;
@@ -175,7 +199,6 @@ export default function Cart() {
           </div>
         ) : (
           <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
-            {/* Items & coupon */}
             <div className="space-y-6 lg:col-span-2">
               <div className="rounded-2xl border border-brand-border bg-brand-card p-4 sm:p-6">
                 <AnimatePresence initial={false}>
@@ -262,7 +285,6 @@ export default function Cart() {
                 </AnimatePresence>
               </div>
 
-              {/* Coupon */}
               <div className="rounded-2xl border border-brand-border bg-brand-card p-4 sm:p-6">
                 <h4 className="flex items-center gap-2 text-sm font-bold text-brand-primary">
                   <Tag className="h-4 w-4 text-brand-gold" /> Coupon Code
@@ -308,7 +330,6 @@ export default function Cart() {
               </button>
             </div>
 
-            {/* Order*/}
             <div className="lg:sticky lg:top-28 lg:self-start">
               <div className="rounded-2xl border border-brand-border bg-brand-card p-6">
                 <h3 className="text-lg font-bold text-brand-primary">Order Summary</h3>
