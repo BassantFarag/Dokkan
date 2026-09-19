@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Search, SlidersHorizontal, X } from "lucide-react";
 import FilterSidebar from "../components/FilterSidebar";
 import Product from "../components/ProductCard";
 import { useState, useEffect } from "react";
@@ -6,6 +6,7 @@ import axios from "axios";
 
 const Shop = () => {
   const [search, setSearch] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
   const [filter, setFilter] = useState({
     category: "all",
@@ -108,7 +109,6 @@ const Shop = () => {
 
         <div className="w-full mb-8 flex items-center gap-2">
           <div className="relative flex-1">
-
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-brand-secondary">
               <Search
                 className="h-5 w-5"
@@ -123,13 +123,37 @@ const Shop = () => {
               placeholder="Search products..."
               className="w-full pl-10 pr-4 py-3 bg-brand-card border border-brand-border rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent text-sm text-brand-primary placeholder:text-brand-secondary transition-all"
             />
-
           </div>
+
+          <button
+            type="button"
+            onClick={() => setShowFilters((prev) => !prev)}
+            className="lg:hidden flex items-center justify-center gap-2 px-4 py-3 bg-brand-card border border-brand-border rounded-xl text-brand-primary hover:border-brand-gold transition-all"
+          >
+            {showFilters ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <SlidersHorizontal className="h-5 w-5" />
+            )}
+
+            <span className="text-sm font-medium">
+              {showFilters ? "Close" : "Filter"}
+            </span>
+          </button>
         </div>
+
+        {showFilters && (
+          <div className="lg:hidden mb-6">
+            <FilterSidebar
+              filter={filter}
+              setFilter={setFilter}
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
-          <div className="lg:col-span-1">
+          <div className="hidden lg:block lg:col-span-1">
             <FilterSidebar
               filter={filter}
               setFilter={setFilter}
@@ -165,3 +189,4 @@ const Shop = () => {
 };
 
 export default Shop;
+
