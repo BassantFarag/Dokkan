@@ -1,19 +1,15 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import OrderDetailsPage from './Pages/OrderDetails';
+import React from 'react'
+import { RouterProvider } from 'react-router-dom';
+import { routes } from './Router/routes';
+import { AuthProvider } from './context/AuthContext';
 
 const App = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        {/* المسار الأساسي لصفحة تفاصيل الطلب مع الـ ID الديناميكي */}
-        <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
-        
-        {/* مسار احتياطي لفتح الصفحة بشكل مباشر على الرابط الحالي لديك */}
-        <Route path="*" element={<OrderDetailsPage />} />
-      </Routes>
-    </BrowserRouter>
-  );
-};
 
-export default App;
+ return (
+  <AuthProvider>
+    <RouterProvider router={routes} />
+  </AuthProvider>
+ );
+}
+
+export default App
