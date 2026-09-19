@@ -1,16 +1,106 @@
 import { Search } from "lucide-react";
 import FilterSidebar from "../components/FilterSidebar";
-import Product from "../components/product";
-import { useState } from "react";
+import Product from "../components/ProductCard";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 const Shop = () => {
   const [search, setSearch] = useState("");
+
   const [filter, setFilter] = useState({
-  category: "all",
-  minPrice: "",
-  maxPrice: "",
-  sortBy: "Default",
-});
+    category: "all",
+    minPrice: "",
+    maxPrice: "",
+    sortBy: "Default",
+  });
+
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+
+        const response = await axios.get(
+          "https://dokkan-store-api.vercel.app/api/products"
+        );
+
+        console.log("API Response:", response.data);
+
+        const fetchedData =
+          response.data.products ||
+          response.data.data ||
+          response.data;
+
+        console.log("Products:", fetchedData);
+
+        setProducts(Array.isArray(fetchedData) ? fetchedData : []);
+      } catch (error) {
+        console.log("Error fetching products:", error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const filteredProducts = products
+    .filter((product) => {
+      const productName = product.name?.toLowerCase() || "";
+      const productCategory = product.category?.toLowerCase() || "";
+      const searchValue = search.toLowerCase();
+
+      const matchesSearch = productName.includes(searchValue);
+
+      const matchesCategory =
+        filter.category === "all" ||
+        productCategory === filter.category.toLowerCase();
+
+      const productPrice = Number(
+        product.discountPrice || product.price || 0
+      );
+
+      const minPrice =
+        filter.minPrice === "" ? 0 : Number(filter.minPrice);
+
+      const maxPrice =
+        filter.maxPrice === "" ? Infinity : Number(filter.maxPrice);
+
+      const matchesMinPrice = productPrice >= minPrice;
+      const matchesMaxPrice = productPrice <= maxPrice;
+
+      return (
+        matchesSearch &&
+        matchesCategory &&
+        matchesMinPrice &&
+        matchesMaxPrice
+      );
+    })
+    .sort((a, b) => {
+      const priceA = Number(a.discountPrice || a.price || 0);
+      const priceB = Number(b.discountPrice || b.price || 0);
+
+      if (filter.sortBy === "Price: Low to High") {
+        return priceA - priceB;
+      }
+
+      if (filter.sortBy === "Price: High to Low") {
+        return priceB - priceA;
+      }
+
+      if (filter.sortBy === "Name: A to Z") {
+        return (a.name || "").localeCompare(b.name || "");
+      }
+
+      if (filter.sortBy === "Name: Z to A") {
+        return (b.name || "").localeCompare(a.name || "");
+      }
+
+      return 0;
+    });
 
   return (
     <div className="min-h-screen bg-brand-main text-brand-primary pb-12 pt-32 md:pt-28 transition-colors duration-300">
@@ -19,12 +109,13 @@ const Shop = () => {
         <div className="w-full mb-8 flex items-center gap-2">
           <div className="relative flex-1">
 
-          
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-brand-secondary">
-              <Search className="h-5 w-5" strokeWidth={2.5} />
+              <Search
+                className="h-5 w-5"
+                strokeWidth={2.5}
+              />
             </div>
 
-           
             <input
               type="text"
               value={search}
@@ -42,11 +133,28 @@ const Shop = () => {
             <FilterSidebar
               filter={filter}
               setFilter={setFilter}
-             />
+            />
           </div>
 
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Product />
+
+            {loading ? (
+              <p className="text-brand-secondary col-span-full text-center text-xl">
+                Loading...
+              </p>
+            ) : filteredProducts.length > 0 ? (
+              filteredProducts.map((item) => (
+                <Product
+                  key={item._id || item.id}
+                  product={item}
+                />
+              ))
+            ) : (
+              <p className="text-brand-secondary col-span-full text-center text-xl">
+                No products found.
+              </p>
+            )}
+
           </div>
 
         </div>

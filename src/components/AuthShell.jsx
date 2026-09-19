@@ -3,16 +3,11 @@ import { motion } from "framer-motion";
 import { NavLink } from "react-router-dom";
 import { LogoMark, LogoWordmark } from "./Logo";
 
-/**
- * Shared shell for /login and /register.
- * Matches the Navbar/Footer palette (#f7f2ed light / #120e0c dark, #c2a38e gold)
- * and adds a soft hanging-lamp glow above the brand mark, echoing the
- * storefront flag/awning in the Dokkan logo.
- */
+
 export default function AuthShell({ title, subtitle, children, footer }) {
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-[#f7f2ed] pt-32 pb-20 dark:bg-[#120e0c] transition-colors">
-      {/* Ambient background glow */}
+      {/* for decoration */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute left-1/2 top-0 h-[420px] w-[620px] -translate-x-1/2 rounded-full bg-[#c2a38e]/25 blur-[120px] dark:bg-[#c2a38e]/15" />
         <div className="absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-[#c2a38e]/10 blur-3xl" />
