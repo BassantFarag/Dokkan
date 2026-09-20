@@ -1,4 +1,4 @@
-import { Heart, ShoppingCart, Star } from "lucide-react";
+import { Heart, ShoppingCart, Star , ImageOff } from "lucide-react";
 
 export const ProductCard = ({ product }) => {
   if (!product) return null;
@@ -22,11 +22,17 @@ export const ProductCard = ({ product }) => {
       </div>
 
       <div className="w-full h-40 rounded-xl overflow-hidden bg-brand-main flex items-center justify-center">
-        <img
-          src={product.images?.[0]?.url}
-          alt={product.name}
-          className="w-full h-full object-cover"
-        />
+       {product.images?.[0]?.url ? (
+          <img
+            src={product.images[0].url}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-1 text-brand-secondary">
+            <ImageOff className="h-8 w-8 text-brand-secondary/60" />
+            <span className="text-[10px] font-medium">No Image</span>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-col gap-1">
@@ -54,10 +60,10 @@ export const ProductCard = ({ product }) => {
 
         <div className="flex items-baseline gap-2 pt-6">
           <span className="text-2xl font-bold text-brand-gold">
-            {product.discountPrice}
+           EGP {(product.discountPrice || product.price)?.toLocaleString()}
           </span>
           <span className="text-xl text-brand-secondary line-through">
-            {product.price}
+            EGP {product.price?.toLocaleString()}
           </span>
         </div>
       </div>
