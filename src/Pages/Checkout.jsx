@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
 import {
   MapPin,
   CreditCard,
@@ -12,19 +13,9 @@ import {
 import { getMyCart } from "../api/cartsApi";
 import { placeOrder } from "../api/ordersApi";
 
-const TAX_RATE = 0.14;
-const FREE_SHIPPING_THRESHOLD = 1000;
+const FREE_SHIPPING_THRESHOLD = 500;
 const SHIPPING_FEE = 50;
-
-const getProduct = (item) => item.product || item.item || item;
-const getId = (item) => getProduct(item)._id || getProduct(item).id || item.productId;
-const getQty = (item) => item.quantity ?? item.qty ?? 1;
-const getPrice = (item) => getProduct(item).price ?? 0;
-const getName = (item) => getProduct(item).name ?? getProduct(item).title ?? "Product";
-const getImage = (item) =>
-  getProduct(item).image ||
-  getProduct(item).thumbnail ||
-  (Array.isArray(getProduct(item).images) ? getProduct(item).images[0] : null);
+const TAX_RATE = 0.14;
 
 const initialForm = {
   fullName: "",
@@ -33,13 +24,19 @@ const initialForm = {
   city: "",
   address: "",
   postalCode: "",
-  notes: "",
+  customerNote: "",
 };
+
+const getId = (item) => item._id || item.id || item.product?._id;
+const getName = (item) => item.title || item.name || item.product?.title || "Product";
+const getPrice = (item) => item.price || item.product?.price || 0;
+const getQty = (item) => item.quantity || item.qty || 1;
+const getImage = (item) => item.image || item.product?.image || item.product?.images?.[0] || null;
 
 export default function Checkout() {
   const navigate = useNavigate();
 
-  const [items, setItems] = useState([]);
+ const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
@@ -51,27 +48,28 @@ export default function Checkout() {
     const fetchCart = async () => {
       try {
         const res = await getMyCart();
-        const data = res.data?.cart ?? res.data?.data ?? res.data ?? {};
-        const cartItems = data.items ?? data.products ?? [];
-        setItems(Array.isArray(cartItems) ? cartItems : []);
+        setCart(res.data);
       } catch {
-        setSubmitError("Couldn't load your cart.");
+        toast.error("Couldn't load your cart.");
       } finally {
         setLoading(false);
       }
     };
     fetchCart();
   }, []);
-
-  const subtotal = useMemo(
+  const items = cart?.items || [];
+ 
+  const calculatedSubtotal = useMemo(
     () => items.reduce((sum, item) => sum + getPrice(item) * getQty(item), 0),
     [items]
   );
+  
+ const subtotal = cart?.subtotal ?? calculatedSubtotal;
   const shipping = subtotal === 0 ? 0 : subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
   const tax = subtotal * TAX_RATE;
-  const total = subtotal + shipping + tax;
+  const total = cart?.total ?? (subtotal + shipping + tax);
   const format = (n) => `EGP ${Math.round(n).toLocaleString()}`;
-
+  
   useEffect(() => {
     if (!loading && items.length === 0 && !placed) {
       navigate("/carts", { replace: true });
@@ -111,14 +109,15 @@ export default function Checkout() {
           postalCode: form.postalCode,
         },
         paymentMethod: "cash_on_delivery",
-        notes: form.notes,
+        customerNote: form.customerNote,
       });
+      toast.success("Order placed successfully!");
       setPlaced(true);
       setTimeout(() => navigate("/myorders"), 1800);
     } catch (err) {
-      setSubmitError(
-        err?.response?.data?.message || "Couldn't place your order. Please try again."
-      );
+      const errorMsg =
+        err?.response?.data?.message || "Couldn't place your order. Please try again.";
+        toast.error(errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -250,8 +249,8 @@ export default function Checkout() {
                   <FileText className="h-4 w-4 text-brand-gold" /> Order Notes (Optional)
                 </h3>
                 <textarea
-                  value={form.notes}
-                  onChange={handleChange("notes")}
+                  value={form.customerNote}
+                  onChange={handleChange("customerNote")}
                   rows={3}
                   placeholder="Any special instructions for your order..."
                   className="mt-4 w-full resize-none rounded-xl border border-brand-border bg-brand-main px-4 py-2.5 text-sm text-brand-primary placeholder-brand-secondary focus:border-brand-gold focus:outline-none"
