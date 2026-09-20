@@ -108,7 +108,7 @@ export default function Hero() {
           >
             <NavLink
               to="/shop"
-              className="group relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-brand-gold text-brand-main font-bold text-sm shadow-lg shadow-brand-gold/20 hover:bg-brand-gold-hover transition-all duration-300"
+              className="group relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full bg-transparent text-brand-primary  font-bold text-sm   transition-all duration-300"
             >
               <span>Explore Collection</span>
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -171,7 +171,7 @@ export default function Hero() {
                 duration: 3,
                 ease: "easeInOut",
               }}
-              className="relative w-44 h-48 sm:w-52 sm:h-56 rounded-b-3xl rounded-t-xl bg-gradient-to-br from-brand-gold via-[#a0846c] to-[#2a211c] p-1 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.5),inset_10px_10px_20px_rgba(255,255,255,0.3),0_20px_40px_rgba(0,0,0,0.4)] flex flex-col items-center justify-center gap-3"
+              className="relative w-44 h-48 sm:w-52 sm:h-56 rounded-b-3xl rounded-t-xl bg-gradient-to-br from-[#A59487] via-[#a0846c] to-[#2a211c] p-1 shadow-[inset_-10px_-10px_20px_rgba(0,0,0,0.5),inset_10px_10px_20px_rgba(255,255,255,0.3),0_20px_40px_rgba(0,0,0,0.4)] flex flex-col items-center justify-center gap-3"
             >
           
               <div className="absolute -top-10 w-20 h-14 border-4 border-brand-gold rounded-t-full shadow-md" />
