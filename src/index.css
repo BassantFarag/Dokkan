@@ -1,8 +1,5 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 @layer base {
   /* Light Theme */
@@ -18,7 +15,8 @@
     --accent-gold-hover: 32 40% 48%;
     
     --border-color: 38 15% 82%;       /* حدود  للكروت */
-    --glass-bg: 38 30% 92% / 0.6;     /* تأثير البلور للـ Navbar */
+    --glass-bg: 38 30% 92%;           /* تأثير البلور للـ Navbar */
+    --glass-alpha: 0.6;
   }
 
   /* Dark Theme */
@@ -30,11 +28,12 @@
     --text-primary: 33 28% 85%;       /* #DDCDC1 (Powder Petal) - النصوص والعناوين الرئيسية */
     --text-secondary: 25 8% 58%;      /* #97897E (Taupe) - النصوص الفرعية والوصف */
     
-    --accent-gold: 33 28% 85%;        /* #DDCDC1 - الأزرار والـ Highlights بالذهبي  */
-    --accent-gold-hover: 33 35% 90%;
+    --accent-gold: 33 40% 68%;        /* #DDCDC1 - الأزرار والـ Highlights بالذهبي  */
+    --accent-gold-hover: 33 45% 76%;
     
     --border-color: 25 10% 20%;       /* #362F29 - حدود الكروت  */
-    --glass-bg: 30 14% 10% / 0.7;     /* تأثير البلور للـ Navbar */
+    --glass-bg: 30 14% 10%;           /* تأثير البلور للـ Navbar */
+    --glass-alpha: 0.7;
   } 
 
   body {
@@ -45,14 +44,14 @@
   }
 }
 
-@theme {
-  --color-brand-main: hsl(var(--bg-main) / <alpha-value>);
-  --color-brand-card: hsl(var(--bg-card) / <alpha-value>);
-  --color-brand-card-hover: hsl(var(--bg-card-hover) / <alpha-value>);
-  --color-brand-primary: hsl(var(--text-primary) / <alpha-value>);
-  --color-brand-secondary: hsl(var(--text-secondary) / <alpha-value>);
-  --color-brand-gold: hsl(var(--accent-gold) / <alpha-value>);
-  --color-brand-gold-hover: hsl(var(--accent-gold-hover) / <alpha-value>);
-  --color-brand-border: hsl(var(--border-color) / <alpha-value>);
-  --color-glass: var(--glass-bg);
+@theme inline {
+  --color-brand-main: hsl(var(--bg-main));
+  --color-brand-card: hsl(var(--bg-card));
+  --color-brand-card-hover: hsl(var(--bg-card-hover));
+  --color-brand-primary: hsl(var(--text-primary));
+  --color-brand-secondary: hsl(var(--text-secondary));
+  --color-brand-gold: hsl(var(--accent-gold));
+  --color-brand-gold-hover: hsl(var(--accent-gold-hover));
+  --color-brand-border: hsl(var(--border-color));
+  --color-glass: hsl(var(--glass-bg) / var(--glass-alpha));
 }
