@@ -14,7 +14,7 @@ export default function LuxuryFooter() {
   ];
 
   return (
-    <footer className="relative w-full overflow-hidden bg-[#120e0c] text-[#f3ece7] pt-28 pb-10">
+    <footer className="relative w-full overflow-hidden bg-[#1C1713] text-[#EBE8E5] pt-28 pb-10">
       
      
       <div className="absolute top-0 left-0 w-full overflow-hidden leading-none -translate-y-[98%] pointer-events-none">

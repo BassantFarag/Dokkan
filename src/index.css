@@ -1,58 +1,54 @@
 @import "tailwindcss";
+
 @custom-variant dark (&:where(.dark, .dark *));
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
-@layer base {
-  /* Light Theme */
-  :root {
-    --bg-main: 38 30% 92%;            /* #E3D5CB (Powder Petal) - خلفية بيج  للموقع */
-    --bg-card: 40 18% 85%;            /* #C6C0BD (Silver / Warm Grey) - خلفية الكروت والكبسولات */
-    --bg-card-hover: 35 22% 78%;      /* #AF9E90 (Khaki Beige) - تأثير الهوفر للكروت */
-    
-    --text-primary: 20 8% 14%;        /* #26221F (Carbon Black) - النصوص والعناوين الرئيسية */
-    --text-secondary: 25 15% 40%;     /* #897360 (Dusty Taupe) - النصوص الفرعية والوصف */
-    
-    --accent-gold: 32 36% 54%;        /* #B29573 (Camel / Warm Gold) - الأزرار والـ Highlights */
-    --accent-gold-hover: 32 40% 48%;
-    
-    --border-color: 38 15% 82%;       /* حدود  للكروت */
-    --glass-bg: 38 30% 92% / 0.6;     /* تأثير البلور للـ Navbar */
-  }
+:root {
+  /* الوضع الفاتح (Light Theme) */
+  --bg-main: 38 30% 92%;           /* خلفية الموقع الأساسية (بيج فاتح) */
+  --bg-card: 40 18% 85%;           /* خلفية الكروت والكبسولات */
+  --bg-card-hover: 35 22% 78%;     /* خلفية الكروت ا (Hover) */
 
-  /* Dark Theme */
-  .dark {
-    --bg-main: 30 14% 10%;            /* #1B1714 (Pitch Black) - خلفية الموقع الأساسية ة */
-    --bg-card: 20 8% 15%;             /* #28211C (Carbon Black) - خلفية الكروت والكبسولات */
-    --bg-card-hover: 25 10% 20%;      /* #362F29 (Deep Mocha) - تأثير الهوفر للكبسولات */
-    
-    --text-primary: 33 28% 85%;       /* #DDCDC1 (Powder Petal) - النصوص والعناوين الرئيسية */
-    --text-secondary: 25 8% 58%;      /* #97897E (Taupe) - النصوص الفرعية والوصف */
-    
-    --accent-gold: 33 28% 85%;        /* #DDCDC1 - الأزرار والـ Highlights بالذهبي  */
-    --accent-gold-hover: 33 35% 90%;
-    
-    --border-color: 25 10% 20%;       /* #362F29 - حدود الكروت  */
-    --glass-bg: 30 14% 10% / 0.7;     /* تأثير البلور للـ Navbar */
-  } 
+  --text-primary: 20 8% 14%;       /* النصوص والعناوين الرئيسية (لون داكن) */
+  --text-secondary: 25 15% 40%;    /* النصوص الفرعية والوصف */
 
-  body {
-    background-color: hsl(var(--bg-main));
-    color: hsl(var(--text-primary));
-    font-family: system-ui, -apple-system, sans-serif;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
+  --accent-gold: 27 17% 36%;       /* اللون المميز / الذهبي  للأزرار والـ Highlights */
+  --accent-gold-hover: 26 17% 28%; /* لون اللون  عند الـ Hover */
+
+  --border-color: 38 15% 82%;      /* لون حدود الكروت والعناصر */
+}
+
+.dark {
+  /* الوضع الداكن (Dark Theme) */
+  --bg-main: 30 14% 10%;           /* خلفية الموقع الأساسية    */
+  --bg-card: 20 8% 15%;            /* خلفية الكروت والكبسولات الداكنة */
+  --bg-card-hover: 25 10% 20%;     /* خلفية الكروت عند الـ Hover في   */
+
+  --text-primary: 33 28% 85%;      /* النصوص والعناوين الرئيسية الفاتحة */
+  --text-secondary: 25 8% 58%;     /* النصوص الفرعية الفاتحة */
+
+  --accent-gold: 33 28% 85%;       /* اللون المميز    */
+  --accent-gold-hover: 33 35% 90%; /* لون المميز عند الـ Hover في الوضع المظلم */
+
+  --border-color: 25 10% 20%;      /* لون حدود الكروت الداكنة */
 }
 
 @theme {
-  --color-brand-main: hsl(var(--bg-main) / <alpha-value>);
-  --color-brand-card: hsl(var(--bg-card) / <alpha-value>);
-  --color-brand-card-hover: hsl(var(--bg-card-hover) / <alpha-value>);
-  --color-brand-primary: hsl(var(--text-primary) / <alpha-value>);
-  --color-brand-secondary: hsl(var(--text-secondary) / <alpha-value>);
-  --color-brand-gold: hsl(var(--accent-gold) / <alpha-value>);
-  --color-brand-gold-hover: hsl(var(--accent-gold-hover) / <alpha-value>);
-  --color-brand-border: hsl(var(--border-color) / <alpha-value>);
-  --color-glass: var(--glass-bg);
+  /* ربط المتغيرات بـ Tailwind CSS v4 */
+  --color-brand-main: hsl(var(--bg-main));
+  --color-brand-card: hsl(var(--bg-card));
+  --color-brand-card-hover: hsl(var(--bg-card-hover));
+
+  --color-brand-primary: hsl(var(--text-primary));
+  --color-brand-secondary: hsl(var(--text-secondary));
+
+  --color-brand-gold: hsl(var(--accent-gold));
+  --color-brand-gold-hover: hsl(var(--accent-gold-hover));
+
+  --color-brand-border: hsl(var(--border-color));
+}
+
+body {
+  background-color: hsl(var(--bg-main)); /* تطبيق الخلفية الأساسية على الصفحة */
+  color: hsl(var(--text-primary));       /* تطبيق لون النص الأساسي */
+  font-family: system-ui, -apple-system, sans-serif; /* الخط الافتراضي */
 }

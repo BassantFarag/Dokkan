@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -42,9 +42,6 @@ export default function Login() {
 
       loginSuccess(token, user);
 
-      // The login response doesn't always include the full profile (e.g. the
-      // name), which is why the header used to fall back to "Customer".
-      // /auth/me returns the real account, so fetch it and merge it in.
       try {
         const meRes = await authMe();
         const freshUser = meRes?.data?.user || meRes?.data?.data || meRes?.data;
@@ -55,7 +52,7 @@ export default function Login() {
         console.error("authMe failed:", e?.response?.data || e);
       }
 
-      toast.success("Welcome back to Dokkan 👋");
+      toast.success("Welcome back to Dokkan ");
       navigate(redirectTo, { replace: true });
     } catch (err) {
       const msg =

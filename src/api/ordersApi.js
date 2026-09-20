@@ -10,6 +10,6 @@ export const myOrder=()=>api.get('orders/my');
 export const getOrderById=(id)=>api.get(`/orders/my/${id}`);
 
 //cancel order
-export const cancelOrder=(id)=>api.get(`/orders/my/${id}`);
-
+// export const cancelOrder=(id)=>api.get(`/orders/my/${id}`);
+export const cancelOrder = (id) => api.patch(`/orders/my/${id}/cancel`);
 

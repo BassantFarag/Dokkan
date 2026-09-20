@@ -51,7 +51,7 @@ export default function Register() {
     return () => clearInterval(t);
   }, [resendTimer]);
 
-  // ✅ helper لعرض أخطاء الـ backend بشكل واضح
+ 
   const getErrorMessage = (err, fallback) => {
     const data = err?.response?.data;
     if (Array.isArray(data?.errors) && data.errors.length) {
@@ -60,22 +60,22 @@ export default function Register() {
     return data?.message || err?.message || fallback;
   };
 
+  // send payload
   const requestOtp = async (values) => {
     setLoading(true);
     try {
-      // ✅ الـ payload بالأسماء اللي الـ backend عايزها بالظبط
+  
       const payload = {
         username: values.username,
         email: values.email,
         phone: values.phone,
         password: values.password,
-        rePassword: values.rePassword,
       };
 
       const res = await sendRegisterOTP(payload);
-      const data = res?.data || {};
+      const data = res.data || {};
 
-      // احتياط: لو الـ backend رجّع 200 بس success: false
+     
       if (data.success === false) {
         throw new Error(data.message || "Server rejected the request");
       }
@@ -83,9 +83,8 @@ export default function Register() {
       setUserInfo(payload);
       setStep(2);
       setResendTimer(60);
-      toast.success(data.message || "We've sent a verification code to your email 📩");
+      toast.success(data.message || "We've sent a verification code to your email");
     } catch (err) {
-      console.error("sendRegisterOTP failed:", err);
       toast.error(getErrorMessage(err, "Couldn't send the code, please try again"));
     } finally {
       setLoading(false);
@@ -93,6 +92,7 @@ export default function Register() {
   };
 
   const handleOtpChange = (index, value) => {
+    // هراجع علي الشرط دا تاني 
     if (!/^\d*$/.test(value)) return;
     const next = [...otp];
     next[index] = value.slice(-1);
@@ -110,9 +110,11 @@ export default function Register() {
   };
 
   const handleOtpPaste = (e) => {
+    // clean otp
     const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, OTP_LENGTH);
     if (!pasted) return;
     e.preventDefault();
+    //check again 
     setOtp(Array.from({ length: OTP_LENGTH }, (_, i) => pasted[i] || ""));
     otpRefs.current[Math.min(pasted.length, OTP_LENGTH - 1)]?.focus();
   };
@@ -126,25 +128,26 @@ export default function Register() {
     setLoading(true);
     try {
       await verifyRegisterOTP({ email: userInfo.email, otp: code });
-      toast.success("Your account is verified 🎉 Please sign in to continue");
+      toast.success("Your account is verified Please sign in to continue");
       navigate("/login", { replace: true });
     } catch (err) {
-      console.error("verifyRegisterOTP failed:", err);
       setOtpError(getErrorMessage(err, "That code is invalid or has expired"));
+      toast.error("That code is invalid or has expired");
     } finally {
       setLoading(false);
     }
   };
 
   const resendOtp = async () => {
-    if (resendTimer > 0 || !userInfo) return;
+    if (resendTimer > 0 || !userInfo){
+       toast.error(`wait for ${resendTimer} S to resend the code`);
+       return;}
     setLoading(true);
     try {
       await sendRegisterOTP(userInfo);
       setResendTimer(60);
       toast.info("A new code is on its way");
     } catch (err) {
-      console.error("resendOtp failed:", err);
       toast.error(getErrorMessage(err, "Couldn't resend the code, please try again"));
     } finally {
       setLoading(false);
@@ -157,7 +160,7 @@ export default function Register() {
       subtitle={
         step === 1
           ? "Join Dokkan in seconds"
-          : `We sent a ${OTP_LENGTH}-digit code to ${userInfo?.email || ""}`
+          : `We sent a ${OTP_LENGTH}-digit code to ${userInfo?.email || "your email"}`
       }
       footer={
         step === 1 && (
