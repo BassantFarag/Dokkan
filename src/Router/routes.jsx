@@ -10,6 +10,7 @@ import Shop from '../Pages/Shop';
 import Login from '../Pages/Login';
 import Register from '../Pages/Register';
 import ForgotPassword from '../Pages/ForgotPassword';
+import OrderDetails from '../Pages/OrderDetails'; 
 import Notfound from "../Pages/Notfound";
 import ProtectedRoute from "../components/ProtectedRoute";
 import GuestRoute from "../components/GuestRoute";
@@ -33,6 +34,14 @@ export const routes = createBrowserRouter([
             element:(
                 <ProtectedRoute>
                     <Myorders />
+                </ProtectedRoute>
+            )
+        },
+        {
+            path:"orders/:orderId", 
+            element:(
+                <ProtectedRoute>
+                    <OrderDetails />
                 </ProtectedRoute>
             )
         },
