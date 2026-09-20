@@ -1,10 +1,6 @@
 import React, { useState } from "react";
 
-/**
- * Shows the user's profile photo when the backend provides one, falling
- * back to a colored circle with their initial otherwise (or if the image
- * fails to load). Checks the common field names APIs use for a photo URL.
- */
+
 export default function Avatar({ user, className = "h-7 w-7 text-[11px]" }) {
   const [imgFailed, setImgFailed] = useState(false);
   const photoUrl =

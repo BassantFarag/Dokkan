@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import RootLayout from "../Layout/RootLayout";
 import Home from "../Pages/Home";
 import Carts from '../Pages/Carts';
+import Checkout from "../Pages/Checkout";
 import Whishlist from '../Pages/Whishlist';
 import Myorders from '../Pages/Myorders';
 import Profile from '../Pages/Profile';
@@ -14,8 +15,9 @@ import Notfound from "../Pages/Notfound";
 import ProtectedRoute from "../components/ProtectedRoute";
 import GuestRoute from "../components/GuestRoute";
 
-export const routes = createBrowserRouter([{
-    path:'/',
+export const routes = createBrowserRouter([
+  {
+    path: "/",
     element: <RootLayout />,
     errorElement: <Notfound />,
     children:[
@@ -91,6 +93,10 @@ export const routes = createBrowserRouter([{
                 </GuestRoute>
             )
         },
+        {
+        path: "checkout",
+        element: <Checkout />,
+      },
 
     ]
 }])
