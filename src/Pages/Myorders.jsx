@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { myOrder } from "../api/orderApi"; 
+import { myOrder } from "../api/ordersApi"; 
 import OrderCard from "../components/OrderCard";
-import toast from "react-toastify";
+import {toast }from "react-toastify";
 import {
   ShoppingBag,
   PackageCheck,
