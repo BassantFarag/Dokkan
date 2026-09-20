@@ -2,7 +2,8 @@ import { Search, SlidersHorizontal, X } from "lucide-react";
 import FilterSidebar from "../components/FilterSidebar";
 import Product from "../components/ProductCard";
 import { useState, useEffect } from "react";
-import axios from "axios";
+import {getAllProducts} from '../api/productApi'
+import { toast } from "react-toastify";
 
 const Shop = () => {
   const [search, setSearch] = useState("");
@@ -23,22 +24,13 @@ const Shop = () => {
       try {
         setLoading(true);
 
-        const response = await axios.get(
-          "https://dokkan-store-api.vercel.app/api/products"
-        );
+        const response = await getAllProducts()
 
-        console.log("API Response:", response.data);
-
-        const fetchedData =
-          response.data.products ||
-          response.data.data ||
-          response.data;
-
-        console.log("Products:", fetchedData);
+        const fetchedData = response.data.products ;
 
         setProducts(Array.isArray(fetchedData) ? fetchedData : []);
       } catch (error) {
-        console.log("Error fetching products:", error);
+       toast.error(error.response?.data?.message || error.message || "Failed to load products");
         setProducts([]);
       } finally {
         setLoading(false);
@@ -53,13 +45,13 @@ const Shop = () => {
       const productName = product.name?.toLowerCase() || "";
       const productCategory = product.category?.toLowerCase() || "";
       const searchValue = search.toLowerCase();
-
+      // Search filter
       const matchesSearch = productName.includes(searchValue);
-
+      // Category filter
       const matchesCategory =
         filter.category === "all" ||
         productCategory === filter.category.toLowerCase();
-
+      // Price filter
       const productPrice = Number(
         product.discountPrice || product.price || 0
       );
@@ -84,22 +76,20 @@ const Shop = () => {
       const priceA = Number(a.discountPrice || a.price || 0);
       const priceB = Number(b.discountPrice || b.price || 0);
 
-      if (filter.sortBy === "Price: Low to High") {
+      if (filter.sortBy === "LowToHigh") {
         return priceA - priceB;
       }
 
-      if (filter.sortBy === "Price: High to Low") {
+      if (filter.sortBy === "HighToLow") {
         return priceB - priceA;
       }
-
-      if (filter.sortBy === "Name: A to Z") {
-        return (a.name || "").localeCompare(b.name || "");
+      if (filter.sortBy === "TopRated") {
+        return (b.averageRating || 0) - (a.averageRating || 0);
       }
-
-      if (filter.sortBy === "Name: Z to A") {
-        return (b.name || "").localeCompare(a.name || "");
+      if (filter.sortBy === "Newest") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
       }
-
+     
       return 0;
     });
 
