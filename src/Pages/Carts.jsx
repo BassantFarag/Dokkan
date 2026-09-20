@@ -81,7 +81,6 @@ export default function Cart() {
     if (nextQty < 1 || updatingId) return;
     setUpdatingId(id);
     
-    // تحديث التغيير محلياً مع الحفاظ على هيكل الكائن
     setItems((prev) =>
       prev.map((it) => (getId(it) === id ? { ...it, quantity: nextQty } : it))
     );
