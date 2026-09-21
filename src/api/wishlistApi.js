@@ -1,13 +1,17 @@
-import api from './axios';
+import api from "./axios";
 
-//Add product to wishlist
-export const addToWishlist =(id,payload)=>api.post(`/wishlist/add/${id}`,payload);
+// Add product to wishlist
+export const addToWishlist = (id) =>
+  api.post(`/wishlists/add/${id}`);
 
-//Remove product from wishlist
-export const removeFromWishlist =(productId)=>api.delete(`/wishlist/remove/${productId}`);
+// Remove product from wishlist
+export const removeFromWishlist = (productId) =>
+  api.delete(`/wishlist/remove/${productId}`);
 
-//get my wishlist 
-export const getMyWishlist =()=>api.get('/wishlists/my');
+// Get my wishlist
+export const getMyWishlist = () =>
+  api.get("/wishlists/my");
 
-//clear wishlist 
-export const clearWishlists =()=>api.delete('/wishlists/clear');
+// Clear wishlist
+export const clearWishlists = () =>
+  api.delete("/wishlists/clear");
