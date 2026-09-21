@@ -1,3 +1,4 @@
+
 import { Heart, ShoppingCart, Star } from "lucide-react";
 
 const Product = ({ product }) => {
@@ -24,7 +25,6 @@ const Product = ({ product }) => {
 
       <div className="flex items-center justify-between gap-1.5 sm:gap-2 w-full min-w-0">
 
-   
         <span className="px-2 sm:px-2.5 md:px-3 py-0.5 text-[9px] sm:text-[10px] md:text-xs font-medium bg-brand-main text-brand-secondary rounded-full truncate max-w-[50%]">
           {product.category || "Product"}
         </span>
@@ -35,7 +35,6 @@ const Product = ({ product }) => {
             {product.stock ?? 0}
           </span>
 
-    
           <button
             type="button"
             aria-label="Add to wishlist"
@@ -43,6 +42,7 @@ const Product = ({ product }) => {
           >
             <Heart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
+
         </div>
       </div>
 
@@ -60,7 +60,6 @@ const Product = ({ product }) => {
         )}
       </div>
 
-  
       <div className="flex flex-col gap-1 min-w-0">
 
         <h3 className="text-xs sm:text-sm md:text-base font-semibold text-brand-primary pt-1 line-clamp-2 min-h-8 sm:min-h-10 leading-5">
@@ -68,11 +67,16 @@ const Product = ({ product }) => {
         </h3>
 
         <div className="flex items-center gap-1 pt-1 min-w-0">
+
           <div className="flex items-center gap-0.5 shrink-0">
             {[1, 2, 3, 4, 5].map((star) => (
               <Star
                 key={star}
-                className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${star <= rating ? "fill-brand-gold text-brand-gold" : "text-brand-border"}`}
+                className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${
+                  star <= rating
+                    ? "fill-brand-gold text-brand-gold"
+                    : "text-brand-border"
+                }`}
               />
             ))}
           </div>
@@ -80,9 +84,11 @@ const Product = ({ product }) => {
           <span className="text-[9px] sm:text-[10px] md:text-xs text-brand-secondary truncate">
             ({product.numReviews || 0})
           </span>
+
         </div>
 
         <div className="flex flex-wrap items-baseline gap-1 sm:gap-1.5 md:gap-2 pt-2 sm:pt-3">
+
           {discountPrice ? (
             <>
               <span className="text-base sm:text-lg md:text-xl font-bold text-brand-gold truncate">
@@ -98,10 +104,10 @@ const Product = ({ product }) => {
               {originalPrice}
             </span>
           )}
+
         </div>
       </div>
 
-    
       <button
         type="button"
         className="w-full py-2 sm:py-2.5 md:py-3 mt-1 bg-brand-gold hover:bg-brand-gold-hover text-brand-main font-medium rounded-lg sm:rounded-xl flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs md:text-sm transition-colors shadow-sm"
@@ -109,6 +115,7 @@ const Product = ({ product }) => {
         <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         <span>Add to Cart</span>
       </button>
+
     </div>
   );
 };

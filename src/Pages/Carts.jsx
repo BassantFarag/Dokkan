@@ -25,12 +25,18 @@ const FREE_SHIPPING_THRESHOLD = 1000;
 const SHIPPING_FEE = 50;
 
 
-const getProduct = (item) => item?.item || item?.product || item || {};
-const getId = (item) => getProduct(item)._id || item?._id;
-const getQty = (item) => item?.quantity ?? 1;
-const getPrice = (item) => getProduct(item).price ?? 0;
-const getName = (item) => getProduct(item).name ?? "Product";
-const getImage = (item) => getProduct(item).image || null;
+const getId = (item) =>
+  item.productId ||
+  (typeof item.product === "string" ? item.product : item.product?._id) ||
+  item._id ||
+  item.id;
+const getQty = (item) => item.quantity ?? item.qty ?? 1;
+const getPrice = (item) => item.price ?? item.product?.price ?? 0;
+const getName = (item) => item.title ?? item.name ?? item.product?.title ?? item.product?.name ?? "Product";
+const getImage = (item) =>
+  item.image ||
+  item.product?.image ||
+  (Array.isArray(item.product?.images) ? item.product.images[0] : null);
 
 export default function Cart() {
   const navigate = useNavigate();

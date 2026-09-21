@@ -23,10 +23,9 @@ const Shop = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-
         const response = await getAllProducts();
-        const fetchedData = response.data.products;
 
+        const fetchedData = response.data.products;
         setProducts(Array.isArray(fetchedData) ? fetchedData : []);
       } catch (error) {
         toast.error(
@@ -127,8 +126,7 @@ const Shop = () => {
             </span>
           </button>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-8 items-start">
           <aside className="hidden lg:block lg:col-span-1">
             <div className="sticky top-28">
               <FilterSidebar filter={filter} setFilter={setFilter} />
