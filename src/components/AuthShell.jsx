@@ -26,7 +26,6 @@ export default function AuthShell({ title, subtitle, children, footer }) {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            {/* glow cast by the lamp — dimmer in dark mode so it doesn't wash out the icon */}
             <motion.div
               animate={{ opacity: [0.5, 0.9, 0.5], scale: [1, 1.08, 1] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}

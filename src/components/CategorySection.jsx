@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { getAllProducts } from "../api/productApi";
 
-// خريطة أيقونات لاختيار أيقونة مناسبة للـ Category تلقائياً
+
 const categoryIcons = {
   electronics: Tv,
   clothing: Shirt,
@@ -31,7 +31,6 @@ export default function CategorySection() {
       .then((res) => {
         const products = res.data.products || [];
 
-        // تجميع الـ Categories المتاحة وحساب عدد المنتجات لكل category
         const categoryMap = products.reduce((acc, product) => {
           if (product.category) {
             const catLower = product.category.toLowerCase();

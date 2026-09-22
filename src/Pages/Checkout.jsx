@@ -9,6 +9,7 @@ import {
   ShoppingBag,
   CheckCircle2,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import { getMyCart } from "../api/cartsApi";
 import { placeOrder } from "../api/ordersApi";
@@ -108,7 +109,7 @@ export default function Checkout() {
           address: form.address,
           postalCode: form.postalCode,
         },
-        paymentMethod: "cash_on_delivery",
+        paymentMethod: "cash",
         customerNote: form.customerNote,
       });
       toast.success("Order placed successfully!");
@@ -145,7 +146,6 @@ export default function Checkout() {
             onSubmit={handleSubmit}
             className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3"
           >
-            {/* Left: shipping & payment &notes */}
             <div className="space-y-6 lg:col-span-2">
               <section className="rounded-2xl border border-brand-border bg-brand-card p-6">
                 <h3 className="flex items-center gap-2 text-sm font-bold text-brand-primary">
@@ -258,7 +258,7 @@ export default function Checkout() {
               </section>
             </div>
 
-            {/* Right: order summary */}
+           
             <div className="lg:sticky lg:top-28 lg:self-start">
               <div className="rounded-2xl border border-brand-border bg-brand-card p-6">
                 <h3 className="text-lg font-bold text-brand-primary">Order Summary</h3>
@@ -324,6 +324,14 @@ export default function Checkout() {
                 >
                   {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
                   Place Order
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate("/carts")}
+                  className="mt-3 flex w-full items-center justify-center gap-1.5 text-xs font-semibold text-brand-gold hover:text-brand-gold-hover"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5" /> Back to Cart
                 </button>
               </div>
             </div>

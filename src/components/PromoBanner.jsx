@@ -30,7 +30,7 @@ export default function PromoBanner() {
     <section className="relative w-full py-12 px-6">
       <div className="max-w-7xl mx-auto space-y-12">
         
-        {/* 1. Value Features Bar */}
+       
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 rounded-[28px] border border-[#8D837D]/20 bg-[#EBE8E5]/40 p-8 backdrop-blur-md dark:border-[#8D837D]/25 dark:bg-[#1C1713]/60">
           {features.map((feature, idx) => {
             const Icon = feature.icon;
@@ -52,7 +52,7 @@ export default function PromoBanner() {
           })}
         </div>
 
-        {/* 2. Limited Time Offer Callout */}
+      
         <div className="relative overflow-hidden rounded-[32px] border border-[#BAAB9A]/30 bg-gradient-to-r from-[#3D342B] via-[#2A221B] to-[#1C1713] p-8 md:p-12 text-[#EBE8E5] shadow-2xl">
           <div className="absolute -right-10 -top-10 h-60 w-60 rounded-full bg-[#BAAB9A]/10 blur-3xl" />
           

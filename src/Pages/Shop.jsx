@@ -4,10 +4,14 @@ import Product from "../components/ProductCard";
 import { useState, useEffect } from "react";
 import { getAllProducts } from "../api/productApi";
 import { toast } from "react-toastify";
+import { useSearchParams } from "react-router-dom";
 
 const Shop = () => {
   const [search, setSearch] = useState("");
+  const [searchParams] = useSearchParams();
+  const categoryParam = searchParams.get("category");
   const [showFilters, setShowFilters] = useState(false);
+  
 
   const [filter, setFilter] = useState({
     category: "all",
@@ -18,15 +22,40 @@ const Shop = () => {
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  //Category filter from home page
+  useEffect(() => {
+    if (categoryParam) {
+      setFilter((prev) => ({
+        ...prev,
+        category: categoryParam,
+      }));
+    }
+  }, [categoryParam]);
+
+  // scroll to top
+useEffect(() => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  if (categoryParam) {
+    setFilter((prev) => ({
+      ...prev,
+      category: categoryParam,
+    }));
+  } else {
+    setFilter((prev) => ({
+      ...prev,
+      category: "all",
+    }));
+  }
+}, [categoryParam]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-
         const response = await getAllProducts();
-        const fetchedData = response.data.products;
 
+        const fetchedData = response.data.products;
         setProducts(Array.isArray(fetchedData) ? fetchedData : []);
       } catch (error) {
         toast.error(
@@ -127,8 +156,7 @@ const Shop = () => {
             </span>
           </button>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-5 sm:gap-6 lg:gap-8 items-start">
           <aside className="hidden lg:block lg:col-span-1">
             <div className="sticky top-28">
               <FilterSidebar filter={filter} setFilter={setFilter} />

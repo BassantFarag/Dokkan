@@ -18,7 +18,7 @@ export default function FeaturedProduct() {
     getAllProducts()
       .then((res) => {
         const allProducts = res.data.products || [];
-        // 🔄 فلترة المنتجات المتاحة فقط في المخزن (stock > 0)
+       
         const inStockProducts = allProducts.filter((product) => product.stock > 0);
         
         setProducts(inStockProducts);
@@ -57,7 +57,7 @@ export default function FeaturedProduct() {
             </h2>
           </div>
 
-          {/* أزرار التنقل */}
+         
           <div className="flex items-center gap-3">
             <Link
               to="/shop"

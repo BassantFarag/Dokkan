@@ -12,7 +12,6 @@ import FormInput from "../components/FormInput";
 import AuthButton from "../components/AuthButton";
 import { sendRegisterOTP, verifyRegisterOTP } from "../api/authApi";
 
-// ✅ الأسماء مطابقة للـ backend: username, rePassword
 const infoSchema = z
   .object({
     username: z.string().min(2, "Name must be at least 2 characters"),
@@ -29,7 +28,7 @@ const infoSchema = z
 const OTP_LENGTH = 6;
 
 export default function Register() {
-  const [step, setStep] = useState(1); // 1 = info, 2 = otp
+  const [step, setStep] = useState(1); 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
@@ -92,7 +91,6 @@ export default function Register() {
   };
 
   const handleOtpChange = (index, value) => {
-    // هراجع علي الشرط دا تاني 
     if (!/^\d*$/.test(value)) return;
     const next = [...otp];
     next[index] = value.slice(-1);

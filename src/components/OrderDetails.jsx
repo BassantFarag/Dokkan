@@ -58,7 +58,7 @@ const OrderDetails = ({ orderData = {}, onCancel, isCancelling }) => {
                     />
                   )}
 
-                  {/* Step Circle */}
+               
                   <div
                     className={`relative z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
                       isCompleted
@@ -73,7 +73,6 @@ const OrderDetails = ({ orderData = {}, onCancel, isCancelling }) => {
                     )}
                   </div>
 
-                  {/* Label */}
                   <span
                     className={`text-[11px] sm:text-xs mt-2 font-medium transition-colors text-center leading-tight whitespace-nowrap ${
                       isCompleted
@@ -125,7 +124,7 @@ const OrderDetails = ({ orderData = {}, onCancel, isCancelling }) => {
         </div>
       </div>
 
-      {/* Shipping & Payment Grid */}
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Shipping Address */}
         <div className="border border-brand-border rounded-2xl p-5 sm:p-6 md:p-8 shadow-sm backdrop-blur-md bg-brand-card text-brand-primary transition-colors duration-300">
