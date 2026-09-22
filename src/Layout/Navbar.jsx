@@ -4,12 +4,13 @@ import { ShoppingBag, Sun, Moon, Menu, X, ArrowUpRight , User} from "lucide-reac
 import { NavLink, useLocation , useNavigate} from "react-router-dom";
 import UserHeader from "./UserHeader";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import { logout as logoutApi } from "../api/authApi";
 import Logo from "../components/Logo";
 
 
 export default function LuxuryHeader() {
-  const [isDark, setIsDark] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { isLoggedIn, user, logoutUser } = useAuth();
@@ -122,13 +123,10 @@ export default function LuxuryHeader() {
         <div className="hidden md:flex items-center gap-3">
           {/* Theme Toggle Button */}
           <button
-            onClick={() => {
-              setIsDark(!isDark);
-              document.documentElement.classList.toggle("dark");
-            }}
+            onClick={toggleTheme}
             className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e4dcd5] bg-[#f7f2ed]/70 dark:bg-[#1f1a18]/70 text-[#2a2421] hover:bg-[#eae1d9] dark:border-[#38302c] dark:text-[#f3ece7] dark:hover:bg-[#2e2623] transition-all shadow-sm backdrop-blur-sm"
           >
-            {isDark ? <Sun className="h-4 w-4 text-[#e8c39e]" /> : <Moon className="h-4 w-4" />}
+            {theme === "dark" ? <Sun className="h-4 w-4 text-[#e8c39e]" /> : <Moon className="h-4 w-4" />}
           </button>
 
           {/* user profile and login */}
@@ -148,13 +146,10 @@ export default function LuxuryHeader() {
         {/* Mobile Menu Button */}
         <div className="flex md:hidden items-center gap-2">
           <button
-            onClick={() => {
-              setIsDark(!isDark);
-              document.documentElement.classList.toggle("dark");
-            }}
+            onClick={toggleTheme}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4dcd5] bg-[#f7f2ed] dark:border-[#38302c] dark:bg-[#1f1a18]"
           >
-            {isDark ? <Sun className="h-4 w-4 text-[#e8c39e]" /> : <Moon className="h-4 w-4" />}
+            {theme === "dark" ? <Sun className="h-4 w-4 text-[#e8c39e]" /> : <Moon className="h-4 w-4" />}
           </button>
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
