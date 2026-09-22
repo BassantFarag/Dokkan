@@ -16,6 +16,58 @@ export default function Shop() {
     sortBy: "Default",
   });
 
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  //Category filter from home page
+  useEffect(() => {
+    if (categoryParam) {
+      setFilter((prev) => ({
+        ...prev,
+        category: categoryParam,
+      }));
+    }
+  }, [categoryParam]);
+
+useEffect(() => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  if (categoryParam) {
+    setFilter((prev) => ({
+      ...prev,
+      category: categoryParam,
+    }));
+  } else {
+    setFilter((prev) => ({
+      ...prev,
+      category: "all",
+    }));
+  }
+}, [categoryParam]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await getAllProducts();
+
+        const fetchedData = response.data.products;
+        setProducts(Array.isArray(fetchedData) ? fetchedData : []);
+      } catch (error) {
+        toast.error(
+          error.response?.data?.message ||
+            error.message ||
+            "Failed to load products",
+        );
+
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   const filteredProducts = products
     .filter((product) => {
       const matchesSearch =

@@ -99,13 +99,13 @@ export const routes = createBrowserRouter([
         element: <Checkout />,
       },
       {
-      path: "Whishlist/:id",
-      element: (
-        <ProtectedRoute>
-          < ProductDetails />
-        </ProtectedRoute>
-      ),
-    },
+        path: "products/:id",
+        element: <ProductDetails />,
+      },
+      {
+        path: "Whishlist/:id",
+        element: <ProductDetails />,
+      },
     ],
   },
 ]);

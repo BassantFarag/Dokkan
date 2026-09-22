@@ -5,10 +5,11 @@ import { NavLink, useLocation , useNavigate} from "react-router-dom";
 import UserHeader from "./UserHeader";
 import { useAuth } from "../contexts/AuthProvider";
 import Logo from "../components/Logo";
+import { getPreferredTheme, setTheme } from "../utils/theme";
 
 
 export default function LuxuryHeader() {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => getPreferredTheme() === "dark");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { isLoggedIn, user, logoutContext } = useAuth();
@@ -117,8 +118,9 @@ export default function LuxuryHeader() {
           {/* Theme Toggle Button */}
           <button
             onClick={() => {
-              setIsDark(!isDark);
-              document.documentElement.classList.toggle("dark");
+              const next = !isDark;
+              setIsDark(next);
+              setTheme(next ? "dark" : "light");
             }}
             className="flex h-10 w-10 items-center justify-center rounded-full border border-[#e4dcd5] bg-[#f7f2ed]/70 dark:bg-[#1f1a18]/70 text-[#2a2421] hover:bg-[#eae1d9] dark:border-[#38302c] dark:text-[#f3ece7] dark:hover:bg-[#2e2623] transition-all shadow-sm backdrop-blur-sm"
           >
@@ -143,8 +145,9 @@ export default function LuxuryHeader() {
         <div className="flex md:hidden items-center gap-2">
           <button
             onClick={() => {
-              setIsDark(!isDark);
-              document.documentElement.classList.toggle("dark");
+              const next = !isDark;
+              setIsDark(next);
+              setTheme(next ? "dark" : "light");
             }}
             className="flex h-9 w-9 items-center justify-center rounded-full border border-[#e4dcd5] bg-[#f7f2ed] dark:border-[#38302c] dark:bg-[#1f1a18]"
           >
