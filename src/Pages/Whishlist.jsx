@@ -6,7 +6,7 @@ import {
   getMyWishlist,
   removeFromWishlist
 } from "../api/wishlistApi";
-import { AddItemToCard } from "../api/cartApi";
+import { AddItemToCard } from "../api/cartsApi";
 import { toast } from "react-toastify";
 
 const Whishlist = () => {
@@ -130,7 +130,8 @@ const Whishlist = () => {
           </div>
         </>
       ) : favourit.length === 0 ? (
-        // page without wishlist products
+        
+          // page without wishlist products
         <div className="flex flex-col items-center justify-center space-y-6 h-[450px] sm:h-[500px] md:h-[450px]">
           {/* Heart */}
           <div className="rounded-full p-4 bg-brand-card text-brand-gold hover:scale-105 hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
@@ -155,6 +156,7 @@ const Whishlist = () => {
             Explore Products
           </button>
         </div>
+
       ) : (
         // page with wishlist products
         <>
@@ -267,3 +269,10 @@ const Whishlist = () => {
 };
 
 export default Whishlist;
+
+
+
+
+
+
+
