@@ -1,16 +1,52 @@
 import { Heart, ShoppingCart, Star, ImageOff } from "lucide-react";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AddItemToCard } from "../api/cartsApi";
-import { addToWishlist } from "../api/wishlistApi";
+import { addToWishlist, removeFromWishlist, getMyWishlist } from "../api/wishlistApi";
 
 export const ProductCard = ({ product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [loadingWishlist, setLoadingWishlist] = useState(false);
+
+  const productId = product?._id || product?.id;
+
+  useEffect(() => {
+    let isMounted = true;
+    const checkWishlistStatus = async () => {
+      try {
+        const response = await getMyWishlist();
+        const wishlistProducts = 
+          response?.wishlist?.products || 
+          response?.data?.wishlist?.products || 
+          response?.data?.products || 
+          response?.products || 
+          [];
+
+        if (Array.isArray(wishlistProducts) && isMounted) {
+          const exists = wishlistProducts.some((item) => {
+            const itemId = item?._id || item?.id || item;
+            return String(itemId) === String(productId);
+          });
+          setIsWishlisted(exists);
+        }
+      } catch (error) {
+        
+      }
+    };
+
+    if (productId) {
+      checkWishlistStatus();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [productId]);
 
   const handleAddToCart = async () => {
     try {
       await AddItemToCard({
-        productId: product._id,
+        productId: productId,
         quantity: 1,
       });
 
@@ -22,19 +58,29 @@ export const ProductCard = ({ product }) => {
     }
   };
 
-  const handleAddToWishlist = async () => {
+  const handleToggleWishlist = async () => {
+    if (loadingWishlist) return;
+
     try {
-      await addToWishlist(product._id);
+      setLoadingWishlist(true);
 
-      setIsWishlisted(true);
-
-      toast.success("Product added to wishlist");
+      if (isWishlisted) {
+        setIsWishlisted(false); 
+        await removeFromWishlist(productId);
+        toast.info("Removed from wishlist");
+      } else {
+        setIsWishlisted(true); 
+        await addToWishlist(productId);
+        toast.success("Product added to wishlist");
+      }
     } catch (error) {
       console.error(error);
-
+      setIsWishlisted(!isWishlisted); 
       toast.error(
-        error.response?.data?.message || "Failed to add product to wishlist",
+        error.response?.data?.message || "Failed to update wishlist",
       );
+    } finally {
+      setLoadingWishlist(false);
     }
   };
 
@@ -61,9 +107,10 @@ export const ProductCard = ({ product }) => {
           </span>
           <button
             type="button"
-            onClick={handleAddToWishlist}
+            onClick={handleToggleWishlist}
+            disabled={loadingWishlist}
             aria-label="Add to wishlist"
-            className="p-1 sm:p-1.5 rounded-full bg-brand-main border border-brand-border shadow-sm hover:text-brand-gold transition-colors shrink-0"
+            className="p-1 sm:p-1.5 rounded-full bg-brand-main border border-brand-border shadow-sm hover:text-brand-gold transition-colors shrink-0 disabled:opacity-50"
           >
             <Heart
               className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${

@@ -29,7 +29,7 @@ const resetSchema = z
 const OTP_LENGTH = 6;
 
 export default function ForgotPassword() {
-  const [step, setStep] = useState(1); // 1 = email, 2 = otp + new password
+  const [step, setStep] = useState(1); 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -64,7 +64,7 @@ export default function ForgotPassword() {
       setEmail(values.email);
       setStep(2);
       setResendTimer(60);
-      toast.success("We've sent a verification code to your email 📩");
+      toast.success("We've sent a verification code to your email ");
     } catch (err) {
       toast.error(err?.response?.data?.message || "Couldn't send the code, please try again");
     } finally {
