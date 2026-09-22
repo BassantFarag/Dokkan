@@ -4,8 +4,10 @@ import Product from "../components/ProductCard";
 import { useState, useEffect } from "react";
 import { getAllProducts } from "../api/productApi";
 import { toast } from "react-toastify";
+import { useParams } from "react-router-dom"; // 1. استيراد useParams
 
 export default function Shop() {
+  const { categoryParam } = useParams(); // 2. تعريف المتغير هنا بشكل صحيح
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -16,40 +18,29 @@ export default function Shop() {
     sortBy: "Default",
   });
 
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  //Category filter from home page
+  // Category filter and scroll management
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     if (categoryParam) {
       setFilter((prev) => ({
         ...prev,
         category: categoryParam,
       }));
+    } else {
+      setFilter((prev) => ({
+        ...prev,
+        category: "all",
+      }));
     }
   }, [categoryParam]);
 
-useEffect(() => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  
-  if (categoryParam) {
-    setFilter((prev) => ({
-      ...prev,
-      category: categoryParam,
-    }));
-  } else {
-    setFilter((prev) => ({
-      ...prev,
-      category: "all",
-    }));
-  }
-}, [categoryParam]);
-
+  // Fetch products (تم دمج التكرار وحل المشكلة)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
         const response = await getAllProducts();
-
         const fetchedData = response.data.products;
         setProducts(Array.isArray(fetchedData) ? fetchedData : []);
       } catch (error) {
@@ -58,7 +49,6 @@ useEffect(() => {
             error.message ||
             "Failed to load products",
         );
-
         setProducts([]);
       } finally {
         setLoading(false);
@@ -95,7 +85,6 @@ useEffect(() => {
       const priceA = Number(a.discountPrice || a.price || 0);
       const priceB = Number(b.discountPrice || b.price || 0);
 
-
       if (filter.sortBy === "LowToHigh") {
         return priceA - priceB;
       }
@@ -115,43 +104,16 @@ useEffect(() => {
       return 0;
     });
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const response = await getAllProducts();
-        const fetchedData = response.data.products;
-
-        setProducts(Array.isArray(fetchedData) ? fetchedData : []);
-      } catch (error) {
-        toast.error(
-          error.response?.data?.message ||
-            error.message ||
-            "Failed to load products",
-        );
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
   return (
     <div className="min-h-screen bg-brand-main text-brand-primary pb-10 pt-24 sm:pt-28 md:pt-32 transition-colors duration-300">
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    
         <SearchCart search={search} setSearch={setSearch} />
 
-   
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-        
           <div className="lg:col-span-1">
             <FilterSidebar filter={filter} setFilter={setFilter} />
           </div>
 
-          
           <main className="lg:col-span-3">
             {loading ? (
               <div className="flex items-center justify-center min-h-[300px]">

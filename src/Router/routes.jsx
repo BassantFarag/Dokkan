@@ -31,6 +31,10 @@ export const routes = createBrowserRouter([
         element: <Shop />,
       },
       {
+        path: "shop/:categoryParam",
+        element: <Shop />,
+      },
+      {
         path: "Myorders",
         element: (
           <ProtectedRoute>

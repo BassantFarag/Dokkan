@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import { AddItemToCard, getMyCart, removeItemFromCart } from "../api/cartsApi";
 import { useNavigate } from "react-router-dom";
-import {addToWishlist,removeFromWishlist,getMyWishlist,} from "../api/wishlistApi";
+import { addToWishlist, removeFromWishlist, getMyWishlist } from "../api/wishlistApi";
 
 export const ProductCard = ({ product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
@@ -73,11 +73,9 @@ export const ProductCard = ({ product }) => {
 
   const isOutOfStock = product?.stock <= 0;
 
-  const handleAddToCart = async (e) => {
-    if (isOutOfStock) return;
   const handleCartAction = async (e) => {
     e.stopPropagation();
-    if (loadingCart) return;
+    if (isOutOfStock || loadingCart) return;
 
     try {
       setLoadingCart(true);
@@ -133,7 +131,9 @@ export const ProductCard = ({ product }) => {
   const handleCardClick = () => {
     if (productId) {
       navigate(`/products/${productId}`);
-    }};
+    }
+  };
+
   if (!product) return null;
 
   const rating = Math.round(product.averageRating || 0);
@@ -153,7 +153,7 @@ export const ProductCard = ({ product }) => {
             {product.price && product.discountPrice
               ? -Math.round(
                   ((product.price - product.discountPrice) / product.price) *
-                    100,
+                    100
                 )
               : 0}
             %
@@ -237,28 +237,23 @@ export const ProductCard = ({ product }) => {
           )}
         </div>
       </div>
+
       <button
         type="button"
-        onClick={handleAddToCart}
-        disabled={isOutOfStock}
-        className={`w-full py-2 sm:py-2.5 md:py-3 mt-1 font-medium rounded-lg sm:rounded-xl flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs md:text-sm transition-colors shadow-sm ${
+        onClick={handleCartAction}
+        disabled={isOutOfStock || loadingCart}
+        className={`w-full py-2 sm:py-2.5 md:py-3 mt-1 font-medium rounded-lg sm:rounded-xl flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs md:text-sm transition-colors shadow-sm disabled:opacity-50 cursor-pointer ${
           isOutOfStock
             ? "bg-brand-border text-brand-secondary cursor-not-allowed opacity-60"
-            : "bg-brand-gold hover:bg-brand-gold-hover text-brand-main"
-        }`}
-      >
-        <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-        <span>{isOutOfStock ? "Out of Stock" : "Add to Cart"}</span>
-        onClick={handleCartAction}
-        disabled={loadingCart}
-        className={`w-full py-2 sm:py-2.5 md:py-3 mt-1 font-medium rounded-lg sm:rounded-xl flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs md:text-sm transition-colors shadow-sm disabled:opacity-50 cursor-pointer ${
-          isInCart
+            : isInCart
             ? "bg-brand-card border border-brand-border text-brand-primary hover:bg-brand-card-hover"
             : "bg-brand-gold hover:bg-brand-gold-hover text-brand-main"
         }`}
       >
         {loadingCart ? (
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        ) : isOutOfStock ? (
+          <span>Out of Stock</span>
         ) : isInCart ? (
           <>
             <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-secondary" />
