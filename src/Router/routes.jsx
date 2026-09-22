@@ -14,7 +14,7 @@ import OrderDetails from "../Pages/OrderDetails";
 import Notfound from "../Pages/Notfound";
 import ProtectedRoute from "../components/ProtectedRoute";
 import GuestRoute from "../components/GuestRoute";
-import WishlistReview from "../components/wishlistReview";
+import ProductDetails from "../components/ProductDetails";
 
 export const routes = createBrowserRouter([
   {
@@ -99,13 +99,13 @@ export const routes = createBrowserRouter([
         element: <Checkout />,
       },
       {
-        path: "Whishlist/:id",
-        element: (
-          <ProtectedRoute>
-            <WishlistReview />
-          </ProtectedRoute>
-        ),
-      },
+      path: "Whishlist/:id",
+      element: (
+        <ProtectedRoute>
+          < ProductDetails />
+        </ProtectedRoute>
+      ),
+    },
     ],
   },
 ]);

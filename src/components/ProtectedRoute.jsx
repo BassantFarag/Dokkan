@@ -1,8 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useAuth } from "../context/AuthContext";
-
+import { useAuth } from "../contexts/AuthProvider";
 
 export default function ProtectedRoute({ children }) {
   const { isLoggedIn } = useAuth();
