@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import { Mail, Phone, ShieldCheck, User as UserIcon, LogOut, MapPin, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useAuth } from "../context/AuthContext";
-import { logout as logoutApi } from "../api/authApi";
+import { useAuth } from "../contexts/AuthProvider";
 import { updateUserProfile } from "../api/userApi";
 import Avatar from "../components/Avatar";
 
 export default function Profile() {
-  const { user, logoutUser, updateUser } = useAuth();
+  const { user, logoutContext, updateUser } = useAuth();
   const navigate = useNavigate();
 
   const role = (user?.role || user?.type || user?.accountType || "").toString().toLowerCase();
@@ -19,12 +18,7 @@ export default function Profile() {
   const [savingAddress, setSavingAddress] = useState(false);
 
   const handleLogout = async () => {
-    try {
-      await logoutApi();
-    } catch {
-      // even if the request fails, still clear the local session
-    }
-    logoutUser();
+    await logoutContext();
     navigate("/login");
   };
 
