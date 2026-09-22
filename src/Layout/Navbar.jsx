@@ -3,9 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingBag, Sun, Moon, Menu, X, ArrowUpRight , User} from "lucide-react";
 import { NavLink, useLocation , useNavigate} from "react-router-dom";
 import UserHeader from "./UserHeader";
+
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import { logout as logoutApi } from "../api/authApi";
+
 import Logo from "../components/Logo";
 
 
@@ -13,7 +15,7 @@ export default function LuxuryHeader() {
   const { theme, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { isLoggedIn, user, logoutUser } = useAuth();
+  const { isLoggedIn, user, logoutContext } = useAuth();
   const location = useLocation();
   const navigate =useNavigate();
  
@@ -26,12 +28,7 @@ export default function LuxuryHeader() {
   ];
 
   const handleLogout = async () => {
-    try {
-      await logoutApi();
-    } catch {
-      // even if the request fails, still clear the local session
-    }
-    logoutUser();
+    await logoutContext();
     navigate("/login");
   };
 

@@ -1,71 +1,145 @@
-import { AuthContext } from "./AuthContext";
-import{
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { toast } from "react-toastify";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
     login as loginApi,
     logout as logoutApi,
     authMe as authMeApi
-} from '../api/authApi'
-import { useState, useEffect } from "react";
+} from '../api/authApi';
 
+export const AuthContext = createContext(null);
 
-export const AuthProvider = ({children}) => {
-    // Lazy initialization
-   const [token, setToken] = useState(() => localStorage.getItem("token"));
-    const [user, setUser] = useState(null);
+export const AuthProvider = ({ children }) => {
+    // Lazy initialization للـ token
+    const [token, setToken] = useState(() => localStorage.getItem("token"));
+
+    const [user, setUser] = useState(() => {
+        try {
+            const raw = localStorage.getItem("user");
+            return raw ? JSON.parse(raw) : null;
+        } catch {
+            return null;
+        }
+    });
+
     const [loading, setLoading] = useState(true);
 
-    // Verify the stored token and restore the authenticated user on  initial load
+    // بيتحقق من الـ token مع السيرفر كل ما الـ token يتغير (أو أول ما الصفحة تفتح)
     useEffect(() => {
-    const fetchUser = async () => {
-      if (!token) {
-        setUser(null);
-        setLoading(false);
-        return;
-      }
+        const fetchUser = async () => {
+            if (!token) {
+                setUser(null);
+                setLoading(false);
+                return;
+            }
 
-      try {
-        setLoading(true);
-        const response = await authMeApi();
-        setUser(response.data.user);
-      } catch (error) {
-        localStorage.removeItem("token");
-        setUser(null);
-        setToken(null);
-      } finally {
-        setLoading(false);
-      }
-    };
+            try {
+                setLoading(true);
+                const response = await authMeApi();
+                const userData = response.data.user;
+                setUser(userData);
+                localStorage.setItem("user", JSON.stringify(userData));
+            } catch (error) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                setUser(null);
+                setToken(null);
+            } finally {
+                setLoading(false);
+            }
+        };
 
-    fetchUser();
-  }, [token]);
+        fetchUser();
+    }, [token]);
 
-    // Authenticate the user and store the token and user data 
-    const  loginContext = async ( email , password ) => {
-        const response = await loginApi({email, password});
+    // تسجيل الدخول بالاتصال بالـ API مباشرة (email/password)
+    const loginContext = useCallback(async (email, password) => {
+        const response = await loginApi({ email, password });
         const newToken = response.data.token;
+        const userData = response.data.user;
 
         localStorage.setItem("token", newToken);
+        if (userData) localStorage.setItem("user", JSON.stringify(userData));
+
         setToken(newToken);
-        setUser(response.data.user);
+        setUser(userData || null);
 
         return response;
-    }
+    }, []);
 
-    // Logout the user and clear the token and user data
-    const logoutContext = async () => {
+    // تسجيل الدخول لما الـ token والـ user يكونوا جاهزين مسبقًا (مثلاً بعد OAuth)
+    const loginSuccess = useCallback((newToken, userData) => {
+        localStorage.setItem("token", newToken);
+        if (userData) localStorage.setItem("user", JSON.stringify(userData));
+        setToken(newToken);
+        setUser(userData || null);
+    }, []);
+
+    // تحديث جزء من بيانات المستخدم (مثلاً عنوان جديد) من غير إعادة تسجيل دخول
+    const updateUser = useCallback((partial) => {
+        setUser((prev) => {
+            const next = { ...(prev || {}), ...partial };
+            localStorage.setItem("user", JSON.stringify(next));
+            return next;
+        });
+    }, []);
+
+    // تسجيل الخروج: بيبلغ السيرفر ثم يمسح الحالة المحلية بغض النظر عن نتيجة الـ API
+    const logoutContext = useCallback(async () => {
         try {
             await logoutApi();
         } catch (error) {
             console.error("Logout failed:", error);
         } finally {
             localStorage.removeItem("token");
+            localStorage.removeItem("user");
             setToken(null);
             setUser(null);
         }
-    }
+    }, []);
+
     return (
-        <AuthContext.Provider value={{token, user, loading,isAuthenticated: !!token && !!user,
-        loginContext, logoutContext}}>
+        <AuthContext.Provider
+            value={{
+                token,
+                user,
+                loading,
+                isLoggedIn: !!token,
+                isAuthenticated: !!token && !!user,
+                loginContext,
+                loginSuccess,
+                logoutContext,
+                updateUser
+            }}
+        >
             {children}
         </AuthContext.Provider>
-    )
+    );
+};
+
+// Hook جاهز لاستخدام الـ Auth في أي مكان بسهولة
+export function useAuth() {
+    const ctx = useContext(AuthContext);
+    if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+    return ctx;
+}
+
+// Hook لحماية المسارات والأزرار التي تتطلب تسجيل دخول مسبق
+export function useRequireAuth() {
+    const { isLoggedIn } = useAuth();
+    const navigate = useNavigate();
+    const location = useLocation();
+
+    return useCallback(
+        (action, message = "Please log in first to continue") => {
+            if (isLoggedIn) {
+                action?.();
+                return true;
+            }
+            toast.error(message);
+            navigate("/login", { state: { from: location.pathname } });
+            return false;
+        },
+        [isLoggedIn, navigate, location]
+    );
 }

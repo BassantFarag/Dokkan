@@ -9,8 +9,8 @@ import { toast } from "react-toastify";
 import AuthShell from "../components/AuthShell";
 import FormInput from "../components/FormInput";
 import AuthButton from "../components/AuthButton";
-import { login, authMe } from "../api/authApi";
-import { useAuth } from "../context/AuthContext";
+import { login } from "../api/authApi";
+import { useAuth } from "../contexts/AuthProvider";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Please enter your email").email("Please enter a valid email"),
@@ -41,16 +41,6 @@ export default function Login() {
       if (!token) throw new Error("no-token");
 
       loginSuccess(token, user);
-
-      try {
-        const meRes = await authMe();
-        const freshUser = meRes?.data?.user || meRes?.data?.data || meRes?.data;
-        if (freshUser && typeof freshUser === "object") {
-          loginSuccess(token, { ...user, ...freshUser });
-        }
-      } catch (e) {
-        console.error("authMe failed:", e?.response?.data || e);
-      }
 
       toast.success("Welcome back to Dokkan ");
       navigate(redirectTo, { replace: true });
