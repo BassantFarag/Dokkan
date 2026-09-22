@@ -2,12 +2,13 @@ import { Heart, ShoppingCart, Star, ImageOff } from "lucide-react";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import { AddItemToCard } from "../api/cartsApi";
+import { useNavigate } from "react-router-dom";
 import { addToWishlist, removeFromWishlist, getMyWishlist } from "../api/wishlistApi";
 
 export const ProductCard = ({ product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [loadingWishlist, setLoadingWishlist] = useState(false);
-
+  const navigate = useNavigate();
   const productId = product?._id || product?.id;
 
   useEffect(() => {
@@ -83,13 +84,19 @@ export const ProductCard = ({ product }) => {
       setLoadingWishlist(false);
     }
   };
-
+  
+  const handleCardClick = () => {
+    if (productId) {
+      navigate(`/Whishlist/${productId}`);
+    }};
   if (!product) return null;
 
   const rating = Math.round(product.averageRating || 0);
 
   return (
-    <div className="w-full min-w-0 bg-brand-card border border-brand-border rounded-xl sm:rounded-2xl shadow-sm p-2.5 sm:p-3 md:p-4 flex flex-col gap-2 sm:gap-2.5 relative text-brand-primary overflow-hidden">
+    <div
+     onClick={handleCardClick}
+     className="w-full min-w-0 bg-brand-card border border-brand-border rounded-xl sm:rounded-2xl shadow-sm p-2.5 sm:p-3 md:p-4 flex flex-col gap-2 sm:gap-2.5 relative text-brand-primary overflow-hidden">
       <div className="flex items-center justify-between gap-1.5 w-full min-w-0">
         <span className="px-2 sm:px-2.5 md:px-3 py-0.5 text-[9px] sm:text-[10px] md:text-xs font-medium bg-brand-main text-brand-secondary rounded-full truncate max-w-[50%]">
           {product.category || "Product"}
