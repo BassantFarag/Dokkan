@@ -1,29 +1,59 @@
-import { Heart, ShoppingCart, Star, ImageOff } from "lucide-react";
+import { Heart, ShoppingCart, Star, ImageOff ,Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
-import { useState } from "react";
-import { AddItemToCard } from "../api/cartsApi";
+import { useState , useEffect } from "react";
+import { getMyCart, AddItemToCard, removeItemFromCart } from "../api/cartsApi";
 import { addToWishlist } from "../api/wishlistApi";
 
 export const ProductCard = ({ product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
-
-  const handleAddToCart = async () => {
+  const [isInCart, setIsInCart] = useState(false);
+useEffect(() => {
+  const checkCart = async () => {
     try {
+      const response = await getMyCart();
+
+      const cartItems = response.data?.items || [];
+
+      const exists = cartItems.some(
+        (item) => item.productId === product._id || item.product?._id === product._id
+      );
+
+      setIsInCart(exists);
+    } catch (error) {
+      console.error("Failed to check cart:", error);
+    }
+  };
+
+  if (product?._id) {
+    checkCart();
+  }
+}, [product?._id]);
+const handleCart = async () => {
+  try {
+    if (isInCart) {
+      await  removeItemFromCart (product._id);
+
+      setIsInCart(false);
+      toast.success("Product removed from cart");
+    } else {
       await AddItemToCard({
         productId: product._id,
         quantity: 1,
       });
 
+      setIsInCart(true);
       toast.success("Product added to cart");
-    } catch (error) {
-      toast.error(
-        error.response?.data?.message || "Failed to add product to cart",
-      );
     }
-  };
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message || "Failed to update cart",
+    );
+  }
+};
 
   const handleAddToWishlist = async () => {
     try {
+      ShoppingCart.style.span.textContent = "removing";
       await addToWishlist(product._id);
 
       setIsWishlisted(true);
@@ -42,6 +72,7 @@ export const ProductCard = ({ product }) => {
 
   const rating = Math.round(product.averageRating || 0);
 
+  
   return (
     <div className="w-full min-w-0 bg-brand-card border border-brand-border rounded-xl sm:rounded-2xl shadow-sm p-2.5 sm:p-3 md:p-4 flex flex-col gap-2 sm:gap-2.5 relative text-brand-primary overflow-hidden">
       <div className="flex items-center justify-between gap-1.5 w-full min-w-0">
@@ -131,14 +162,23 @@ export const ProductCard = ({ product }) => {
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={handleAddToCart}
-        className="w-full py-2 sm:py-2.5 md:py-3 mt-1 bg-brand-gold hover:bg-brand-gold-hover text-brand-main font-medium rounded-lg sm:rounded-xl flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs md:text-sm transition-colors shadow-sm"
-      >
-        <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-        <span>Add to Cart</span>
-      </button>
+     <button
+  type="button"
+  onClick={handleCart}
+  className={`w-full py-2 sm:py-2.5 md:py-3 mt-1 font-medium rounded-lg sm:rounded-xl flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs md:text-sm transition-colors shadow-sm ${
+    isInCart
+      ? "bg-gray-100 hover:bg-gray-200 text-gray-600"
+      : "bg-brand-gold hover:bg-brand-gold-hover text-brand-main"
+  }`}
+>
+  {isInCart ? (
+    <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+  ) : (
+    <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+  )}
+
+  <span>{isInCart ? "Remove" : "Add to Cart"}</span>
+</button>
     </div>
   );
 };
