@@ -1,11 +1,7 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../contexts/AuthProvider"
 
-/**
- * Wrap /login and /register so an already logged-in user
- * gets bounced back home instead of seeing the auth forms again.
- */
 export default function GuestRoute({ children }) {
   const { isLoggedIn } = useAuth();
 

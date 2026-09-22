@@ -1,10 +1,6 @@
 import { motion } from "framer-motion";
 
-/**
- * Loading Component
- * Features active celestial physics: orbiting planets, moving moons,
- * traveling energy comets, flowing dashed orbital streams, and responsive soundwaves.
- */
+
 const Loading = () => {
   // Heights for the 6 central gold pillars matching the logo
     const barHeights = [40, 58, 78, 108, 86, 62];

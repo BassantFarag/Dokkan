@@ -1,70 +1,134 @@
-import { Heart, ShoppingCart, Star, ImageOff ,Trash2 } from "lucide-react";
+import { Heart, ShoppingCart, Star, ImageOff, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
-import { useState , useEffect } from "react";
-import { getMyCart, AddItemToCard, removeItemFromCart } from "../api/cartsApi";
-import { addToWishlist } from "../api/wishlistApi";
+import { useState, useEffect } from "react";
+import { AddItemToCard, getMyCart, removeItemFromCart } from "../api/cartsApi";
+import { useNavigate } from "react-router-dom";
+import {addToWishlist,removeFromWishlist,getMyWishlist,} from "../api/wishlistApi";
 
 export const ProductCard = ({ product }) => {
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [loadingWishlist, setLoadingWishlist] = useState(false);
+
   const [isInCart, setIsInCart] = useState(false);
-useEffect(() => {
-  const checkCart = async () => {
+  const [loadingCart, setLoadingCart] = useState(false);
+
+  const navigate = useNavigate();
+  const productId = product?._id || product?.id;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchUserData = async () => {
+      if (!productId) return;
+
+      try {
+        const [wishlistRes, cartRes] = await Promise.allSettled([
+          getMyWishlist(),
+          getMyCart(),
+        ]);
+
+        if (wishlistRes.status === "fulfilled" && isMounted) {
+          const response = wishlistRes.value;
+          const wishlistData =
+            response?.data?.wishlist || response?.wishlist || response?.data;
+          const products = wishlistData?.products || [];
+
+          const exists = products.some((item) => {
+            const itemId = item?._id || item?.id || item;
+            return String(itemId) === String(productId);
+          });
+          setIsWishlisted(exists);
+        }
+
+        if (cartRes.status === "fulfilled" && isMounted) {
+          const cartData = cartRes.value;
+          const data = cartData?.data ?? cartData?.cart ?? cartData;
+          const cartItems = data?.items ?? [];
+
+          const existsInCart = cartItems.some((item) => {
+            const itemProdId =
+              item?.productId ||
+              (typeof item?.product === "string"
+                ? item?.product
+                : item?.product?._id) ||
+              item?.product?.id ||
+              item?._id ||
+              item?.id;
+            return String(itemProdId) === String(productId);
+          });
+
+          setIsInCart(existsInCart);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [productId]);
+
+  const handleCartAction = async (e) => {
+    e.stopPropagation();
+    if (loadingCart) return;
+
     try {
-      const response = await getMyCart();
+      setLoadingCart(true);
 
-      const cartItems = response.data?.items || [];
-
-      const exists = cartItems.some(
-        (item) => item.productId === product._id || item.product?._id === product._id
-      );
-
-      setIsInCart(exists);
+      if (isInCart) {
+        await removeItemFromCart(productId);
+        setIsInCart(false);
+        toast.info("Removed from cart");
+      } else {
+        await AddItemToCard({
+          productId: productId,
+          quantity: 1,
+        });
+        setIsInCart(true);
+        toast.success("Product added to cart successfully!");
+      }
     } catch (error) {
-      console.error("Failed to check cart:", error);
+      console.error("Cart toggle error:", error);
+      if (error.response?.status === 401) {
+        toast.error("Please login first");
+        navigate("/login");
+        return;
+      }
+      toast.error(error.response?.data?.message || "Failed to update cart");
+    } finally {
+      setLoadingCart(false);
     }
   };
 
-  if (product?._id) {
-    checkCart();
-  }
-}, [product?._id]);
-const handleCart = async () => {
-  try {
-    if (isInCart) {
-      await  removeItemFromCart (product._id);
+  const handleToggleWishlist = async (e) => {
+    e.stopPropagation();
+    if (loadingWishlist) return;
 
-      setIsInCart(false);
-      toast.success("Product removed from cart");
-    } else {
-      await AddItemToCard({
-        productId: product._id,
-        quantity: 1,
-      });
-
-      setIsInCart(true);
-      toast.success("Product added to cart");
-    }
-  } catch (error) {
-    toast.error(
-      error.response?.data?.message || "Failed to update cart",
-    );
-  }
-};
-
-  const handleAddToWishlist = async () => {
     try {
-      ShoppingCart.style.span.textContent = "removing";
-      await addToWishlist(product._id);
-
-      setIsWishlisted(true);
-
-      toast.success("Product added to wishlist");
+      setLoadingWishlist(true);
+      if (isWishlisted) {
+        await removeFromWishlist(productId);
+        setIsWishlisted(false);
+        toast.info("Removed from wishlist");
+      } else {
+        await addToWishlist(productId);
+        setIsWishlisted(true);
+        toast.success("Product added to wishlist");
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Wishlist toggle error:", error);
+      toast.error(error.response?.data?.message || "Failed to update wishlist");
+    } finally {
+      setLoadingWishlist(false);
+    }
+  };
 
-      toast.error(
-        error.response?.data?.message || "Failed to add product to wishlist",
-      );
+  const handleCardClick = () => {
+    if (productId) {
+      navigate(`/product/${productId}`);
     }
   };
 
@@ -72,9 +136,11 @@ const handleCart = async () => {
 
   const rating = Math.round(product.averageRating || 0);
 
-  
   return (
-    <div className="w-full min-w-0 bg-brand-card border border-brand-border rounded-xl sm:rounded-2xl shadow-sm p-2.5 sm:p-3 md:p-4 flex flex-col gap-2 sm:gap-2.5 relative text-brand-primary overflow-hidden">
+    <div
+      onClick={handleCardClick}
+      className="w-full min-w-0 bg-brand-card border border-brand-border rounded-xl sm:rounded-2xl shadow-sm p-2.5 sm:p-3 md:p-4 flex flex-col gap-2 sm:gap-2.5 relative text-brand-primary overflow-hidden cursor-pointer"
+    >
       <div className="flex items-center justify-between gap-1.5 w-full min-w-0">
         <span className="px-2 sm:px-2.5 md:px-3 py-0.5 text-[9px] sm:text-[10px] md:text-xs font-medium bg-brand-main text-brand-secondary rounded-full truncate max-w-[50%]">
           {product.category || "Product"}
@@ -92,9 +158,10 @@ const handleCart = async () => {
           </span>
           <button
             type="button"
-            onClick={handleAddToWishlist}
-            aria-label="Add to wishlist"
-            className="p-1 sm:p-1.5 rounded-full bg-brand-main border border-brand-border shadow-sm hover:text-brand-gold transition-colors shrink-0"
+            onClick={handleToggleWishlist}
+            disabled={loadingWishlist}
+            aria-label="Toggle wishlist"
+            className="p-1 sm:p-1.5 rounded-full bg-brand-main border border-brand-border shadow-sm hover:text-brand-gold transition-colors shrink-0 disabled:opacity-50"
           >
             <Heart
               className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
@@ -117,7 +184,6 @@ const handleCart = async () => {
         ) : (
           <div className="flex flex-col items-center justify-center gap-1 text-brand-secondary">
             <ImageOff className="w-6 h-6 sm:w-8 sm:h-8 text-brand-secondary/60" />
-
             <span className="text-[9px] sm:text-[10px] font-medium">
               No Image
             </span>
@@ -131,18 +197,16 @@ const handleCart = async () => {
         </h3>
 
         <div className="flex items-center gap-1 pt-1 sm:pt-2 min-w-0">
-          <div className="flex items-center gap-0.5 shrink-0">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${
-                  star <= rating
-                    ? "fill-brand-gold text-brand-gold"
-                    : "text-brand-border"
-                }`}
-              />
-            ))}
-          </div>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <Star
+              key={star}
+              className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${
+                star <= rating
+                  ? "fill-brand-gold text-brand-gold"
+                  : "text-stone-400 fill-stone-200 dark:text-stone-500 dark:fill-stone-800"
+              }`}
+            />
+          ))}
 
           <span className="text-[9px] sm:text-[10px] text-brand-secondary truncate">
             ({product.numReviews || 0})
@@ -161,24 +225,30 @@ const handleCart = async () => {
           )}
         </div>
       </div>
-
-     <button
-  type="button"
-  onClick={handleCart}
-  className={`w-full py-2 sm:py-2.5 md:py-3 mt-1 font-medium rounded-lg sm:rounded-xl flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs md:text-sm transition-colors shadow-sm ${
-    isInCart
-      ? "bg-gray-100 hover:bg-gray-200 text-gray-600"
-      : "bg-brand-gold hover:bg-brand-gold-hover text-brand-main"
-  }`}
->
-  {isInCart ? (
-    <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-  ) : (
-    <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-  )}
-
-  <span>{isInCart ? "Remove" : "Add to Cart"}</span>
-</button>
+      <button
+        type="button"
+        onClick={handleCartAction}
+        disabled={loadingCart}
+        className={`w-full py-2 sm:py-2.5 md:py-3 mt-1 font-medium rounded-lg sm:rounded-xl flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs md:text-sm transition-colors shadow-sm disabled:opacity-50 cursor-pointer ${
+          isInCart
+            ? "bg-brand-card border border-brand-border text-brand-primary hover:bg-brand-card-hover"
+            : "bg-brand-gold hover:bg-brand-gold-hover text-brand-main"
+        }`}
+      >
+        {loadingCart ? (
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        ) : isInCart ? (
+          <>
+            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-secondary" />
+            <span>Remove from Cart</span>
+          </>
+        ) : (
+          <>
+            <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span>Add to Cart</span>
+          </>
+        )}
+      </button>
     </div>
   );
 };

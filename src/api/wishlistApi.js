@@ -5,9 +5,9 @@ export const addToWishlist = (id) =>
   api.post(`/wishlists/add/${id}`);
 
 // Remove product from wishlist
-export const removeFromWishlist = (productId) =>
-  api.delete(`/wishlist/remove/${productId}`);
-
+export const removeFromWishlist = (productId) => {
+  return api.delete(`/wishlists/remove/${productId}`);
+};
 // Get my wishlist
 export const getMyWishlist = () =>
   api.get("/wishlists/my");
