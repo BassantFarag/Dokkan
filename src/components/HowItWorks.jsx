@@ -30,17 +30,15 @@ export default function HowItWorks() {
     offset: ["start 70%", "end 50%"],
   });
 
-  // حساب حركة المسار والشاحنة
+
   const pathLength = useTransform(scrollYProgress, [0, 1], [0, 1]);
   const truckX = useTransform(scrollYProgress, [0, 1], ["16%", "84%"]);
 
   return (
     <section ref={sectionRef} className="relative overflow-hidden py-28">
-      {/* 🌟 هالة الخلفية المضيئة المقتبسة من لون Powder Petal / Deep Walnut */}
       <div className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#BAAB9A]/25 blur-[140px] dark:bg-[#BAAB9A]/15" />
 
       <div className="relative mx-auto max-w-7xl px-6 text-center">
-        {/* شارة العنوان (Badge) */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -51,7 +49,7 @@ export default function HowItWorks() {
           <span>Three Easy Steps</span>
         </motion.div>
 
-        {/* العنوان الرئيسي */}
+        {/* main title*/}
         <h2 className="text-3xl font-extrabold text-[#1C1713] md:text-5xl dark:text-[#EBE8E5]">
           How It <span className="text-[#5C422B] dark:text-[#BAAB9A]">Works</span>
         </h2>
@@ -61,7 +59,7 @@ export default function HowItWorks() {
 
         <div className="relative mt-24 grid grid-cols-1 gap-y-20 md:grid-cols-3 md:gap-x-8">
           
-          {/* Truck Desktop Only */}
+          {/*  Desktop Only */}
           <div className="pointer-events-none absolute -top-12 left-0 z-20 hidden w-full md:block">
             
            {/* doted  line */}
@@ -123,12 +121,10 @@ export default function HowItWorks() {
                 whileHover={{ y: -8 }}
                 className="group mt-4 relative z-10 flex flex-col items-center rounded-3xl border border-[#8D837D]/20 bg-[#EBE8E5]/40 p-8 backdrop-blur-xl shadow-lg transition-all duration-300 hover:border-[#BAAB9A]/60 hover:bg-[#EBE8E5]/70 hover:shadow-[0_0_30px_rgba(186,171,154,0.2)] dark:border-[#8D837D]/20 dark:bg-[#1C1713]/40 dark:hover:border-[#BAAB9A]/60 dark:hover:bg-[#1C1713]/70 dark:hover:shadow-[0_0_30px_rgba(186,171,154,0.15)]"
               >
-                {/* رقم الخطوة في الخلفية */}
                 <span className="pointer-events-none absolute top-4 right-5 text-4xl font-black text-[#645C4C]/15 transition-colors group-hover:text-[#5C422B]/25 select-none dark:text-[#8D837D]/20 dark:group-hover:text-[#BAAB9A]/30">
                   {step.number}
                 </span>
 
-                {/* حاوي الأيقونة المضيء عند الـ Hover */}
                 <motion.div
                   whileHover={{ rotate: [0, -8, 8, 0] }}
                   transition={{ duration: 0.5 }}

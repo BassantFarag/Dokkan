@@ -59,7 +59,7 @@ export default function OrderCard({ order, onClick }) {
     });
   };
 
-  // حساب مجموع قطع المنتجات داخل الطلب
+
   const itemsCount = Array.isArray(order?.items)
     ? order.items.reduce((acc, item) => acc + (Number(item.quantity) || 1), 0)
     : 0;
@@ -91,7 +91,6 @@ export default function OrderCard({ order, onClick }) {
               </span>
             </div>
 
-            {/* Status Badge */}
             <span
               className={`inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider sm:px-3 sm:text-[11px] ${statusMeta.classes}`}
             >
@@ -118,7 +117,6 @@ export default function OrderCard({ order, onClick }) {
           </div>
         </div>
 
-        {/* Right Side: Total Price */}
         <div className="flex w-full items-center justify-between gap-4 border-t border-brand-border/50 pt-3 sm:w-auto sm:shrink-0 sm:justify-end sm:gap-5 sm:border-t-0 sm:pt-0">
           <div className="flex flex-col gap-0.5 sm:items-end">
             <span className="text-[10px] font-bold uppercase tracking-wider text-brand-secondary sm:hidden">

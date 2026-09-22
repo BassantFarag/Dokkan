@@ -146,7 +146,6 @@ export default function Checkout() {
             onSubmit={handleSubmit}
             className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3"
           >
-            {/* Left: shipping & payment &notes */}
             <div className="space-y-6 lg:col-span-2">
               <section className="rounded-2xl border border-brand-border bg-brand-card p-6">
                 <h3 className="flex items-center gap-2 text-sm font-bold text-brand-primary">
@@ -259,7 +258,7 @@ export default function Checkout() {
               </section>
             </div>
 
-            {/* Right: order summary */}
+           
             <div className="lg:sticky lg:top-28 lg:self-start">
               <div className="rounded-2xl border border-brand-border bg-brand-card p-6">
                 <h3 className="text-lg font-bold text-brand-primary">Order Summary</h3>

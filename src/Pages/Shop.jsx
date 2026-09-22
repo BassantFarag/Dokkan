@@ -4,10 +4,14 @@ import Product from "../components/ProductCard";
 import { useState, useEffect } from "react";
 import { getAllProducts } from "../api/productApi";
 import { toast } from "react-toastify";
+import { useSearchParams } from "react-router-dom";
 
 const Shop = () => {
   const [search, setSearch] = useState("");
+  const [searchParams] = useSearchParams();
+  const categoryParam = searchParams.get("category");
   const [showFilters, setShowFilters] = useState(false);
+  
 
   const [filter, setFilter] = useState({
     category: "all",
@@ -18,6 +22,32 @@ const Shop = () => {
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  //Category filter from home page
+  useEffect(() => {
+    if (categoryParam) {
+      setFilter((prev) => ({
+        ...prev,
+        category: categoryParam,
+      }));
+    }
+  }, [categoryParam]);
+
+  // scroll to top
+useEffect(() => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  if (categoryParam) {
+    setFilter((prev) => ({
+      ...prev,
+      category: categoryParam,
+    }));
+  } else {
+    setFilter((prev) => ({
+      ...prev,
+      category: "all",
+    }));
+  }
+}, [categoryParam]);
 
   useEffect(() => {
     const fetchProducts = async () => {
