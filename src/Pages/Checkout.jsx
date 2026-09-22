@@ -136,8 +136,7 @@ function CheckoutForm() {
         setSubmitError(errText);
         return;
       }
-
-     
+      
       const { error, paymentMethod: stripeMethod } = await stripe.createPaymentMethod({
         type: 'card',
         card: cardElement,
@@ -155,7 +154,8 @@ function CheckoutForm() {
     setSubmitting(true);
     setSubmitError("");
     try {
-      await placeOrder({
+     
+      const orderPayload = {
         shippingAddress: {
           fullName: form.fullName,
           phone: form.phone,
@@ -165,9 +165,15 @@ function CheckoutForm() {
           postalCode: form.postalCode,
         },
         paymentMethod: paymentMethod,
-        stripePaymentMethodId: stripePaymentMethodId,
         customerNote: form.customerNote,
-      });
+      };
+
+   
+      if (paymentMethod === "stripe" && stripePaymentMethodId) {
+        orderPayload.stripePaymentMethodId = stripePaymentMethodId;
+      }
+
+      await placeOrder(orderPayload);
 
       toast.success("Order placed successfully!");
       setPlaced(true);
