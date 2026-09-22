@@ -15,6 +15,7 @@ export default function HomeProductCard({ product }) {
     : 0;
 
   const productId = product?._id || product?.id;
+  const isOutOfStock = product?.stock <= 0;
 
     useEffect(() => {
     let isMounted = true;
@@ -79,6 +80,8 @@ export default function HomeProductCard({ product }) {
     e.preventDefault();
     e.stopPropagation();
 
+    if (isOutOfStock) return;
+
     try {
       setLoadingCart(true);
       await AddItemToCard({ productId: productId, quantity: 1 });
@@ -99,7 +102,9 @@ export default function HomeProductCard({ product }) {
             <img
               src={product?.images?.[0]?.url || product?.image}
               alt={product?.name || "Product"}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              className={`h-full w-full object-cover transition-transform duration-500 ${
+                isOutOfStock ? "blur-sm grayscale" : "group-hover:scale-105"
+              }`}
             />
           ) : (
             <div className="flex flex-col items-center justify-center gap-1.5 text-[#645C4C] dark:text-[#8D837D]">
@@ -136,6 +141,14 @@ export default function HomeProductCard({ product }) {
           >
             <Heart className={`h-3.5 w-3.5 ${isWishlisted ? "fill-current" : ""}`} />
           </button>
+
+          {isOutOfStock && (
+            <div className="absolute inset-0 z-[5] flex items-center justify-center bg-black/30">
+              <span className="rounded-full bg-red-600/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-white shadow-sm">
+                Out of Stock
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Product Details */}
@@ -182,8 +195,8 @@ export default function HomeProductCard({ product }) {
         <button
           type="button"
           onClick={handleAddToCart}
-          disabled={loadingCart}
-          className="rounded-full bg-[#5C422B] p-2.5 text-[#EBE8E5] shadow-md transition-all hover:bg-[#3D342B] hover:shadow-lg disabled:opacity-50 dark:bg-[#BAAB9A] dark:text-[#1C1713] dark:hover:bg-[#EDD4C1]"
+          disabled={loadingCart || isOutOfStock}
+          className="rounded-full bg-[#5C422B] p-2.5 text-[#EBE8E5] shadow-md transition-all hover:bg-[#3D342B] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#BAAB9A] dark:text-[#1C1713] dark:hover:bg-[#EDD4C1]"
           aria-label="Add to cart"
         >
           <ShoppingBag className="h-3.5 w-3.5" />

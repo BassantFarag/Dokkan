@@ -1,17 +1,20 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
+import { getAvatarUrl, getDisplayName } from "../utils/user";
 
 export default function Avatar({ user, className = "h-7 w-7 text-[11px]" }) {
   const [imgFailed, setImgFailed] = useState(false);
-  const photoUrl =
-    user?.avatar || user?.image || user?.photo || user?.picture || user?.profileImage || user?.avatarUrl;
-  const initial = (user?.name || user?.email || "U").trim().charAt(0).toUpperCase();
+  const photoUrl = getAvatarUrl(user);
+  const initial = (getDisplayName(user) || user?.email || "U").trim().charAt(0).toUpperCase();
+
+  useEffect(() => {
+    setImgFailed(false);
+  }, [photoUrl]);
 
   if (photoUrl && !imgFailed) {
     return (
       <img
         src={photoUrl}
-        alt={user?.name || "Profile"}
+        alt={getDisplayName(user) || "Profile"}
         onError={() => setImgFailed(true)}
         className={`rounded-full object-cover ${className}`}
       />

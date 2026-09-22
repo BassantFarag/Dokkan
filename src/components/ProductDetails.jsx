@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { Heart, Trash2, ShoppingCart, Loader2 } from "lucide-react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { toast } from "react-toastify";
-
-// استيراد Swiper والمكونات التابعة لها مع وحدة التمرير المصغر والتأثير الإبداعي
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Thumbs, FreeMode, EffectCreative } from "swiper/modules";
 import "swiper/css";
@@ -12,31 +10,24 @@ import "swiper/css/pagination";
 import "swiper/css/thumbs";
 import "swiper/css/free-mode";
 import "swiper/css/effect-creative";
-
 import {
   getMyWishlist,
   addToWishlist,
   removeFromWishlist,
 } from "../api/wishlistApi";
-
 import { AddItemToCard, getMyCart, removeItemFromCart } from "../api/cartsApi";
 import { getAllProducts, getSingleProduct } from "../api/productApi";
-
 import {
   getProductReview,
   addReview,
   deleteReview,
 } from "../api/ReviewsApi";
-
 import Loading from "./Loading";
-
-// مكون المنتجات المشابهة (Related Products)
 const RelatedProducts = ({ currentProductId, categoryId }) => {
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cartItemsIds, setCartItemsIds] = useState(new Set());
   const [cartLoading, setCartLoading] = useState(null);
-
   useEffect(() => {
     const fetchRelatedAndCart = async () => {
       try {
@@ -212,27 +203,20 @@ const RelatedProducts = ({ currentProductId, categoryId }) => {
 const ProductDetails = () => {
   const navigate = useNavigate();
   const params = useParams();
-
   const id = params.id || params.productId;
-
   const [activeTab, setActiveTab] = useState("description");
   const [product, setProduct] = useState(null);
-
   const [pageLoading, setPageLoading] = useState(true);
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [cartLoading, setCartLoading] = useState(false);
   const [reviewLoading, setReviewLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(null);
-
   const [isFavorite, setIsFavorite] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [reviews, setReviews] = useState([]);
-
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
-
   const [reviewComment, setReviewComment] = useState("");
   const [reviewRating, setReviewRating] = useState(0);
-
   const fetchReviews = async () => {
     if (!id) return;
     try {
@@ -243,7 +227,6 @@ const ProductDetails = () => {
       console.error("Reviews error:", error);
     }
   };
-
   useEffect(() => {
     const fetchPageData = async () => {
       if (!id) {
@@ -331,7 +314,7 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = async () => {
-    if (!product?._id || cartLoading) return;
+    if (!product?._id || cartLoading || product?.stock <= 0) return;
 
     try {
       setCartLoading(true);
@@ -428,7 +411,7 @@ const ProductDetails = () => {
     if (singleImg) productImages = [singleImg];
   }
 
-  // شاشة الـ Loading بدون إخفاء الهيدر
+  const isOutOfStock = product?.stock <= 0;
   if (pageLoading) {
     return (
       <div className="bg-brand-main min-h-screen text-brand-primary pt-28 pb-20 md:pt-32">
@@ -441,7 +424,6 @@ const ProductDetails = () => {
 
   return (
     <div className="bg-brand-main min-h-screen text-brand-primary pt-28 pb-20 md:pt-32">
-      {/* تخصيص لون أسهم وسويبر السلايدر لتكون باللون البني */}
       <style>{`
         .custom-fan-slider .swiper-button-next,
         .custom-fan-slider .swiper-button-prev {
@@ -486,10 +468,8 @@ const ProductDetails = () => {
       ) : (
         <section className="px-6">
           <div className="max-w-6xl mx-auto">
-            {/* Product Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
               
-              {/* Fan / Creative Stacked Cards Template */}
               <div className="flex flex-col gap-6 bg-brand-card p-6 rounded-3xl border border-brand-border shadow-sm">
                 {productImages.length > 0 ? (
                   <div className="relative w-full">
@@ -518,11 +498,21 @@ const ProductDetails = () => {
                           <img
                             src={imgUrl}
                             alt={`${product.name || "Product"} ${index + 1}`}
-                            className="w-full h-full object-cover rounded-2xl shadow-lg transition-transform duration-500 hover:scale-102"
+                            className={`w-full h-full object-cover rounded-2xl shadow-lg transition-transform duration-500 ${
+                              isOutOfStock ? "blur-sm grayscale" : "hover:scale-102"
+                            }`}
                           />
                         </SwiperSlide>
                       ))}
                     </Swiper>
+
+                    {isOutOfStock && (
+                      <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+                        <span className="px-4 py-1.5 text-sm font-bold tracking-wide uppercase bg-red-600/90 text-white rounded-full shadow-md">
+                          Out of Stock
+                        </span>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="flex items-center justify-center h-[400px] text-brand-secondary font-medium">
@@ -531,13 +521,11 @@ const ProductDetails = () => {
                 )}
               </div>
 
-              {/* Details */}
               <div className="flex flex-col gap-6">
                 <h1 className="text-3xl font-semibold text-brand-primary">
                   {product.name}
                 </h1>
 
-                {/* Brand + Category */}
                 <div className="flex items-center gap-3 text-sm">
                   {product.brand && (
                     <>
@@ -552,7 +540,6 @@ const ProductDetails = () => {
                   </span>
                 </div>
 
-                {/* Rating + Wishlist */}
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1">
                     {Array.from({ length: 5 }).map((_, index) => (
@@ -597,19 +584,24 @@ const ProductDetails = () => {
                   </button>
                 </div>
 
-                {/* Price */}
-                <p className="text-2xl font-semibold text-brand-gold">
-                  EGP {product.discountPrice || product.price}
-                </p>
+                <div className="flex items-center gap-3">
+                  <p className="text-2xl font-semibold text-brand-gold">
+                    EGP {product.discountPrice || product.price}
+                  </p>
+                  {isOutOfStock && (
+                    <span className="px-3 py-1 text-xs font-bold uppercase tracking-wide bg-red-600/90 text-white rounded-full">
+                      Out of Stock
+                    </span>
+                  )}
+                </div>
 
-                {/* Quantity */}
                 <div className="flex items-center gap-4">
                   <span className="text-brand-secondary">Quantity</span>
                   <div className="flex items-center border border-brand-border rounded-xl overflow-hidden bg-brand-card">
                     <button
                       type="button"
                       onClick={decreaseQuantity}
-                      disabled={quantity === 1 || cartLoading}
+                      disabled={quantity === 1 || cartLoading || isOutOfStock}
                       className="px-4 py-2 text-xl text-brand-primary hover:bg-brand-border/50 transition disabled:opacity-40 cursor-pointer"
                     >
                       -
@@ -620,7 +612,7 @@ const ProductDetails = () => {
                     <button
                       type="button"
                       onClick={increaseQuantity}
-                      disabled={cartLoading}
+                      disabled={cartLoading || isOutOfStock}
                       className="px-4 py-2 text-xl text-brand-primary hover:bg-brand-border/50 transition disabled:opacity-40 cursor-pointer"
                     >
                       +
@@ -628,15 +620,16 @@ const ProductDetails = () => {
                   </div>
                 </div>
 
-                {/* Cart Button */}
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  disabled={cartLoading}
+                  disabled={cartLoading || isOutOfStock}
                   className="w-full md:w-fit px-8 py-3 rounded-xl bg-brand-primary text-brand-main font-medium hover:bg-brand-gold-hover transition-all duration-300 hover:scale-105 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                 >
                   {cartLoading ? (
                     <span>Adding...</span>
+                  ) : isOutOfStock ? (
+                    <span>Out of Stock</span>
                   ) : (
                     <>
                       <ShoppingCart size={20} />
@@ -647,7 +640,6 @@ const ProductDetails = () => {
               </div>
             </div>
 
-            {/* Description + Reviews Tabs */}
             <div className="mt-16">
               <div className="flex items-center gap-8 border-b border-brand-border">
                 <button
@@ -675,7 +667,6 @@ const ProductDetails = () => {
                 </button>
               </div>
 
-              {/* Description Content */}
               {activeTab === "description" && (
                 <div className="py-8">
                   <h2 className="text-xl font-semibold text-brand-primary mb-4">
@@ -687,7 +678,6 @@ const ProductDetails = () => {
                 </div>
               )}
 
-              {/* Reviews Content */}
               {activeTab === "reviews" && (
                 <div className="py-8">
                   <h2 className="text-xl font-semibold text-brand-primary mb-6">
@@ -748,7 +738,6 @@ const ProductDetails = () => {
                     )}
                   </div>
 
-                  {/* Add Review Form */}
                   <div className="mt-8 max-w-4xl">
                     <h3 className="text-lg font-semibold text-brand-primary mb-4">
                       Add Your Review
@@ -801,7 +790,6 @@ const ProductDetails = () => {
               )}
             </div>
 
-            {/* Related Products Section */}
             <RelatedProducts 
               currentProductId={product._id} 
               categoryId={product.category?._id || product.category} 

@@ -44,7 +44,10 @@ export const ProductCard = ({ product }) => {
     };
   }, [productId]);
 
-  const handleAddToCart = async () => {
+  const isOutOfStock = product?.stock <= 0;
+
+  const handleAddToCart = async (e) => {
+    if (isOutOfStock) return;
     try {
       await AddItemToCard({
         productId: productId,
@@ -87,7 +90,7 @@ export const ProductCard = ({ product }) => {
   
   const handleCardClick = () => {
     if (productId) {
-      navigate(`/Whishlist/${productId}`);
+      navigate(`/products/${productId}`);
     }};
   if (!product) return null;
 
@@ -130,12 +133,14 @@ export const ProductCard = ({ product }) => {
         </div>
       </div>
 
-      <div className="w-full aspect-square sm:aspect-[4/3] rounded-lg sm:rounded-xl overflow-hidden bg-brand-main flex items-center justify-center">
+      <div className="relative w-full aspect-square sm:aspect-[4/3] rounded-lg sm:rounded-xl overflow-hidden bg-brand-main flex items-center justify-center">
         {product.images?.[0]?.url ? (
           <img
             src={product.images[0].url}
             alt={product.name || "Product"}
-            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            className={`w-full h-full object-cover transition-transform duration-300 ${
+              isOutOfStock ? "blur-sm grayscale" : "hover:scale-105"
+            }`}
           />
         ) : (
           <div className="flex flex-col items-center justify-center gap-1 text-brand-secondary">
@@ -143,6 +148,14 @@ export const ProductCard = ({ product }) => {
 
             <span className="text-[9px] sm:text-[10px] font-medium">
               No Image
+            </span>
+          </div>
+        )}
+
+        {isOutOfStock && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+            <span className="px-3 py-1 text-[10px] sm:text-xs font-bold tracking-wide uppercase bg-red-600/90 text-white rounded-full shadow-sm">
+              Out of Stock
             </span>
           </div>
         )}
@@ -188,10 +201,15 @@ export const ProductCard = ({ product }) => {
       <button
         type="button"
         onClick={handleAddToCart}
-        className="w-full py-2 sm:py-2.5 md:py-3 mt-1 bg-brand-gold hover:bg-brand-gold-hover text-brand-main font-medium rounded-lg sm:rounded-xl flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs md:text-sm transition-colors shadow-sm"
+        disabled={isOutOfStock}
+        className={`w-full py-2 sm:py-2.5 md:py-3 mt-1 font-medium rounded-lg sm:rounded-xl flex items-center justify-center gap-1 sm:gap-1.5 text-[10px] sm:text-xs md:text-sm transition-colors shadow-sm ${
+          isOutOfStock
+            ? "bg-brand-border text-brand-secondary cursor-not-allowed opacity-60"
+            : "bg-brand-gold hover:bg-brand-gold-hover text-brand-main"
+        }`}
       >
         <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-        <span>Add to Cart</span>
+        <span>{isOutOfStock ? "Out of Stock" : "Add to Cart"}</span>
       </button>
     </div>
   );

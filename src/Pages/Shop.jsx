@@ -32,7 +32,6 @@ const Shop = () => {
     }
   }, [categoryParam]);
 
-  // scroll to top
 useEffect(() => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   
