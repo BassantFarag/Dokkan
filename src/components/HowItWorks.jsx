@@ -49,7 +49,7 @@ export default function HowItWorks() {
           <span>Three Easy Steps</span>
         </motion.div>
 
-        {/* main title*/}
+    
         <h2 className="text-3xl font-extrabold text-[#1C1713] md:text-5xl dark:text-[#EBE8E5]">
           How It <span className="text-[#5C422B] dark:text-[#BAAB9A]">Works</span>
         </h2>
@@ -59,7 +59,7 @@ export default function HowItWorks() {
 
         <div className="relative mt-24 grid grid-cols-1 gap-y-20 md:grid-cols-3 md:gap-x-8">
           
-          {/*  Desktop Only */}
+         
           <div className="pointer-events-none absolute -top-12 left-0 z-20 hidden w-full md:block">
             
            {/* doted  line */}
@@ -69,7 +69,7 @@ export default function HowItWorks() {
               viewBox="0 0 100 1"
               preserveAspectRatio="none"
             >
-             {/* back line */}
+             
               <line
                 x1="16" y1="0.5" x2="84" y2="0.5"
                 stroke="currentColor"

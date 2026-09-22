@@ -15,7 +15,7 @@ export default function AuthShell({ title, subtitle, children, footer }) {
       </div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-md flex-col items-center px-6">
-        {/* Hanging lamp + brand mark */}
+       
         <div className="relative mb-8 flex flex-col items-center">
           {/* lamp cord */}
           <div className="h-6 w-px bg-[#c2a38e]/50" />

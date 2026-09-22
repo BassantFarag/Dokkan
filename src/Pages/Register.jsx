@@ -171,7 +171,7 @@ export default function Register() {
         )
       }
     >
-      {/* Step indicator */}
+   
       <div className="mb-6 flex items-center justify-center gap-2">
         {[1, 2].map((s) => (
           <div key={s} className="flex items-center gap-2">

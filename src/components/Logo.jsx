@@ -15,7 +15,6 @@ export function LogoMark({ className = "h-9" }) {
   );
 }
 
-/** "DOKKAN" wordmark, cropped from the same supplied artwork. */
 export function LogoWordmark({ className = "h-6" }) {
   return (
     <>

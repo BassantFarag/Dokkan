@@ -36,9 +36,7 @@ export default function LuxuryFooter() {
           
         
           <div className="space-y-4">
-            {/* Footer is always on the dark palette, so the "dark" wrapper
-                forces the logo's dark-mode colors regardless of the site's
-                current theme toggle. */}
+           
             <NavLink to="/" className="dark flex items-center">
               <Logo markClassName="h-10" textClassName="h-6" />
             </NavLink>
@@ -104,7 +102,7 @@ export default function LuxuryFooter() {
             </div>
           </div>
 
-         {/* 3d shape  */}
+        
           <div className="flex justify-center items-center perspective-1000">
             <motion.div
               animate={{

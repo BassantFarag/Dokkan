@@ -74,14 +74,14 @@ export default function OrderCard({ order, onClick }) {
       whileHover={{ y: -3, transition: { duration: 0.2 } }}
       className="group relative w-full cursor-pointer overflow-hidden rounded-2xl border border-brand-border/80 bg-brand-card/90 p-4 backdrop-blur-md transition-all duration-300 hover:border-brand-gold/60 hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)] sm:p-5 lg:p-6"
     >
-      {/* Hover glow */}
+  
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-gold/0 via-brand-gold/10 to-brand-gold/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
       <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-        {/* Left Side: Order Info */}
+     
         <div className="min-w-0 flex-1 space-y-2.5 sm:space-y-3">
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            {/* Order ID */}
+          
             <div className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-brand-border/50 bg-brand-main/60 px-2.5 py-1 text-xs font-black tracking-wider text-brand-primary">
               <ShoppingBag className="h-3.5 w-3.5 text-brand-gold" />
               <span>

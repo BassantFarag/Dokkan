@@ -75,7 +75,6 @@ export default function FeaturedProduct() {
           </div>
         </div>
 
-        {/* Swiper Carousel */}
         <Swiper
           modules={[Navigation, Autoplay]}
           navigation={{

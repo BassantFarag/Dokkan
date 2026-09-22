@@ -13,12 +13,10 @@ const RelatedProducts = ({ currentProductId, category }) => {
         setLoading(true);
         const res = await getAllProducts();
         
-        // استخراج مصفوفة المنتجات بناءً على هيكل الـ API لديك
+        
         const products = res.data?.products || res.products || res.data || [];
         
-        // تصفية المنتجات:
-        // 1. استبعاد المنتج الحالي
-        // 2. تصفية المنتجات التي تنتمي لنفس الـ category (نص مقارنة مباشرة)
+       
         const filtered = products.filter((item) => {
           const itemId = item._id || item.id;
           const isNotCurrent = String(itemId) !== String(currentProductId);
@@ -27,12 +25,12 @@ const RelatedProducts = ({ currentProductId, category }) => {
           return isNotCurrent && isSameCategory;
         });
         
-        // إذا لم توجد منتجات كافية في نفس القسم، نعرض منتجات أخرى كبديل حتى لا يظهر الفراغ
+       
         const finalProducts = filtered.length > 0 
           ? filtered 
           : products.filter(item => String(item._id || item.id) !== String(currentProductId));
         
-        setRelated(finalProducts.slice(0, 4)); // عرض أول 4 منتجات مرتبطة
+        setRelated(finalProducts.slice(0, 4)); 
       } catch (error) {
         console.error("Error loading related products:", error);
       } finally {

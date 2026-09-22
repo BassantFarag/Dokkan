@@ -69,8 +69,7 @@ export default function CategorySection() {
   return (
     <section className="py-16 px-6 text-[#1C1713] dark:text-[#EBE8E5]">
       <div className="max-w-7xl mx-auto text-center space-y-10">
-        
-        {/* Header */}
+     
         <div className="space-y-2">
           <h2 className="text-3xl font-black tracking-tight sm:text-4xl">
             Shop by Category
@@ -93,7 +92,7 @@ export default function CategorySection() {
                 className="group relative cursor-pointer overflow-hidden rounded-[24px] border border-[#8D837D]/20 bg-[#EBE8E5]/40 p-6 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-[#BAAB9A] hover:shadow-xl dark:border-[#8D837D]/25 dark:bg-[#1C1713]/70 dark:hover:border-[#BAAB9A]"
               >
                 <div className="flex flex-col items-center space-y-4">
-                  {/* Icon Container */}
+    
                   <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EDD4C1]/50 text-[#5C422B] transition-transform duration-300 group-hover:scale-110 dark:bg-[#3D342B] dark:text-[#BAAB9A]">
                     <IconComponent className="h-7 w-7" />
                   </div>

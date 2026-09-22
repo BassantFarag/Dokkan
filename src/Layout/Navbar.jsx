@@ -113,7 +113,7 @@ export default function LuxuryHeader() {
           })}
         </nav>
 
-        {/* Right Actions */}
+       
         <div className="hidden md:flex items-center gap-3">
           {/* Theme Toggle Button */}
           <button

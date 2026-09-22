@@ -9,7 +9,7 @@ const UserHeader = ({ user, onLogout }) => {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
 
-  const role = (user?.role || user?.type || user?.accountType || "").toString().toLowerCase();
+  const role = (user?.role || user?.type || user?.accountType || "User").toString().toLowerCase();
   const isAdmin = role === "admin" || user?.isAdmin === true;
   const roleLabel = isAdmin ? "Admin" : "Customer";
 

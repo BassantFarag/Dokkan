@@ -297,11 +297,11 @@ const ProductDetails = () => {
       if (isFavorite) {
         await removeFromWishlist(product._id);
         setIsFavorite(false);
-        toast.success("Removed from wishlist 🤍");
+        toast.success("Removed from wishlist ");
       } else {
         await addToWishlist(product._id);
         setIsFavorite(true);
-        toast.success("Added to wishlist ❤️");
+        toast.success("Added to wishlist ");
       }
     } catch (error) {
       console.error("Wishlist error:", error);
@@ -318,6 +318,25 @@ const ProductDetails = () => {
 
     try {
       setCartLoading(true);
+
+      const cartRes = await getMyCart();
+      const cartItems = cartRes?.data?.items || [];
+
+      const alreadyInCart = cartItems.some((item) => {
+        const itemId =
+          item.productId ||
+          (typeof item.product === "string" ? item.product : item.product?._id) ||
+          item._id ||
+          item.id;
+        return String(itemId) === String(product._id);
+      });
+
+      if (alreadyInCart) {
+        toast.info(
+          "This product is already in your cart. Go to your cart to update the quantity.",
+        );
+        return;
+      }
 
       await AddItemToCard({
         productId: product._id,
@@ -414,7 +433,7 @@ const ProductDetails = () => {
   const isOutOfStock = product?.stock <= 0;
   if (pageLoading) {
     return (
-      <div className="bg-brand-main min-h-screen text-brand-primary pt-28 pb-20 md:pt-32">
+      <div className="bg-brand-main min-h-screen text-brand-primary ">
         <div className="flex items-center justify-center min-h-[60vh]">
           <Loading />
         </div>
@@ -704,18 +723,19 @@ const ProductDetails = () => {
                                   : ""}
                               </span>
                               <div className="flex gap-1">
-                                {Array.from({ length: 5 }).map((_, index) => (
-                                  <span
-                                    key={index}
-                                    className={
-                                      index < review.rating
-                                        ? "text-yellow-500"
-                                        : "text-gray-400"
-                                    }
-                                  >
-                                    ★
-                                  </span>
-                                ))}
+                                {Array.from({ length: 5 }).map((_, index) => {
+                                  const isFilled = index < review.rating;
+                                  return (
+                                    <Star
+                                      key={index}
+                                      className={`h-4 w-4 ${
+                                        isFilled
+                                          ? "fill-brand-gold text-brand-gold"
+                                          : "text-brand-secondary/40"
+                                      }`}
+                                    />
+                                  );
+                                })}
                               </div>
                             </div>
 
@@ -757,7 +777,13 @@ const ProductDetails = () => {
                                 : "text-gray-400"
                             }`}
                           >
-                            ★
+                                  <Star
+                                  className={`h-7 w-7 transition-colors ${
+                                    isFilled
+                                      ? "fill-brand-gold text-brand-gold" 
+                                      : "text-brand-secondary/40"          
+                                  }`}
+                                />
                           </button>
                         );
                       })}
@@ -778,7 +804,7 @@ const ProductDetails = () => {
                     >
                       {reviewLoading ? (
                         <>
-                          <Loading size="sm" />
+                          
                           Adding...
                         </>
                       ) : (

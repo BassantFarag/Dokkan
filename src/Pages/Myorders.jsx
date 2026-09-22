@@ -51,7 +51,7 @@ export default function MyOrdersPage() {
   ).length;
 
   return (
-    /* pt-24 / md:pt-28 = مسافة الـ Navbar عشان المحتوى ميلزقش فيه */
+    
     <div className="flex min-h-screen justify-center bg-brand-main px-4 pb-10 pt-24 font-sans text-brand-primary sm:px-6 sm:pb-12 md:px-10 md:pt-28">
       <div className="w-full max-w-5xl space-y-6 sm:space-y-8">
         
@@ -114,7 +114,6 @@ export default function MyOrdersPage() {
             </button>
           </div>
         ) : orders.length > 0 ? (
-          /* Orders List */
           <div className="space-y-3 sm:space-y-4">
             {orders.map((order) => (
               <OrderCard

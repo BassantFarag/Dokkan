@@ -2,6 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  Elements,
+  CardElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 import {
   MapPin,
   CreditCard,
@@ -10,9 +17,12 @@ import {
   CheckCircle2,
   Loader2,
   ArrowLeft,
+  Banknote,
 } from "lucide-react";
 import { getMyCart } from "../api/cartsApi";
 import { placeOrder } from "../api/ordersApi";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const FREE_SHIPPING_THRESHOLD = 500;
 const SHIPPING_FEE = 50;
@@ -35,15 +45,26 @@ const getQty = (item) => item.quantity || item.qty || 1;
 const getImage = (item) => item.image || item.product?.image || item.product?.images?.[0] || null;
 
 export default function Checkout() {
-  const navigate = useNavigate();
+  return (
+    <Elements stripe={stripePromise}>
+      <CheckoutForm />
+    </Elements>
+  );
+}
 
- const [cart, setCart] = useState(null);
+function CheckoutForm() {
+  const navigate = useNavigate();
+  const stripe = useStripe();
+  const elements = useElements();
+
+  const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [placed, setPlaced] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("cash");
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -58,14 +79,15 @@ export default function Checkout() {
     };
     fetchCart();
   }, []);
+
   const items = cart?.items || [];
- 
+  
   const calculatedSubtotal = useMemo(
     () => items.reduce((sum, item) => sum + getPrice(item) * getQty(item), 0),
     [items]
   );
   
- const subtotal = cart?.subtotal ?? calculatedSubtotal;
+  const subtotal = cart?.subtotal ?? calculatedSubtotal;
   const shipping = subtotal === 0 ? 0 : subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_FEE;
   const tax = subtotal * TAX_RATE;
   const total = cart?.total ?? (subtotal + shipping + tax);
@@ -97,6 +119,39 @@ export default function Checkout() {
     e.preventDefault();
     if (!validate() || submitting) return;
 
+    let stripePaymentMethodId = null;
+
+    if (paymentMethod === "stripe") {
+      if (!stripe || !elements) {
+        const errText = "Stripe has not loaded yet. Please try again.";
+        toast.error(errText);
+        setSubmitError(errText);
+        return;
+      }
+      
+      const cardElement = elements.getElement(CardElement);
+      if (!cardElement) {
+        const errText = " Please enter your credit card details(Stripe)";
+        toast.error(errText);
+        setSubmitError(errText);
+        return;
+      }
+
+     
+      const { error, paymentMethod: stripeMethod } = await stripe.createPaymentMethod({
+        type: 'card',
+        card: cardElement,
+      });
+
+      if (error) {
+        toast.error(error.message);
+        setSubmitError(error.message);
+        return;
+      }
+
+      stripePaymentMethodId = stripeMethod.id;
+    }
+
     setSubmitting(true);
     setSubmitError("");
     try {
@@ -109,16 +164,19 @@ export default function Checkout() {
           address: form.address,
           postalCode: form.postalCode,
         },
-        paymentMethod: "cash",
+        paymentMethod: paymentMethod,
+        stripePaymentMethodId: stripePaymentMethodId,
         customerNote: form.customerNote,
       });
+
       toast.success("Order placed successfully!");
       setPlaced(true);
       setTimeout(() => navigate("/myorders"), 1800);
     } catch (err) {
       const errorMsg =
-        err?.response?.data?.message || "Couldn't place your order. Please try again.";
-        toast.error(errorMsg);
+        err?.response?.data?.message || err?.message || "Couldn't place your order. Please try again.";
+      toast.error(errorMsg);
+      setSubmitError(errorMsg);
     } finally {
       setSubmitting(false);
     }
@@ -235,13 +293,62 @@ export default function Checkout() {
                 <h3 className="flex items-center gap-2 text-sm font-bold text-brand-primary">
                   <CreditCard className="h-4 w-4 text-brand-gold" /> Payment Method
                 </h3>
-                <div className="mt-4 flex items-center gap-3 rounded-xl border border-brand-gold bg-brand-card-hover px-4 py-3.5">
-                  <CreditCard className="h-4 w-4 text-brand-gold" />
-                  <div>
-                    <p className="text-sm font-semibold text-brand-primary">Cash on Delivery</p>
-                    <p className="text-xs text-brand-secondary">Pay when you receive your order</p>
+                
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div 
+                    onClick={() => setPaymentMethod("cash")}
+                    className={`flex items-center gap-3 rounded-xl border p-4 cursor-pointer transition-all ${
+                      paymentMethod === "cash" 
+                        ? "border-brand-gold bg-brand-card-hover" 
+                        : "border-brand-border bg-brand-main"
+                    }`}
+                  >
+                    <Banknote className="h-5 w-5 text-brand-gold" />
+                    <div>
+                      <p className="text-sm font-semibold text-brand-primary">Cash on Delivery</p>
+                      <p className="text-xs text-brand-secondary">Pay when you receive</p>
+                    </div>
+                  </div>
+
+                  <div 
+                    onClick={() => setPaymentMethod("stripe")}
+                    className={`flex items-center gap-3 rounded-xl border p-4 cursor-pointer transition-all ${
+                      paymentMethod === "stripe" 
+                        ? "border-brand-gold bg-brand-card-hover" 
+                        : "border-brand-border bg-brand-main"
+                    }`}
+                  >
+                    <CreditCard className="h-5 w-5 text-brand-gold" />
+                    <div>
+                      <p className="text-sm font-semibold text-brand-primary">Stripe / Credit Card</p>
+                      <p className="text-xs text-brand-secondary">Pay securely with card</p>
+                    </div>
                   </div>
                 </div>
+
+                {paymentMethod === "stripe" && (
+                  <div className="mt-4 p-4 rounded-xl border border-brand-border bg-brand-main">
+                    <p className="text-xs font-medium text-brand-secondary mb-2">Card Information</p>
+                    <div className="p-3 rounded-lg border border-brand-border bg-brand-card">
+                      <CardElement
+                        options={{
+                          style: {
+                            base: {
+                              fontSize: "14px",
+                              color: "#3f2d20", 
+                              "::placeholder": {
+                                color: "#8c7a6b", 
+                              },
+                            },
+                            invalid: {
+                              color: "#9e2146",
+                            },
+                          },
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
               </section>
 
               <section className="rounded-2xl border border-brand-border bg-brand-card p-6">
@@ -258,7 +365,6 @@ export default function Checkout() {
               </section>
             </div>
 
-           
             <div className="lg:sticky lg:top-28 lg:self-start">
               <div className="rounded-2xl border border-brand-border bg-brand-card p-6">
                 <h3 className="text-lg font-bold text-brand-primary">Order Summary</h3>
@@ -320,10 +426,10 @@ export default function Checkout() {
                 <button
                   type="submit"
                   disabled={submitting || items.length === 0}
-                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-brand-gold py-3 text-sm font-bold text-zinc-950 transition-colors hover:bg-brand-gold-hover disabled:opacity-60"
+                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-brand-gold py-3 text-sm font-bold text-zinc-950 transition-colors hover:bg-brand-gold-hover disabled:opacity-60 cursor-pointer"
                 >
                   {submitting && <Loader2 className="h-4 w-4 animate-spin" />}
-                  Place Order
+                  Place Order ({paymentMethod === "stripe" ? "Pay with Stripe" : "Cash"})
                 </button>
 
                 <button
@@ -339,7 +445,6 @@ export default function Checkout() {
         )}
       </div>
 
-      {/* Success overlay */}
       <AnimatePresence>
         {placed && (
           <motion.div

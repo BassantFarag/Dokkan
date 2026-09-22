@@ -10,7 +10,7 @@ import {
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-    // Lazy initialization للـ token
+    
     const [token, setToken] = useState(() => localStorage.getItem("token"));
 
     const [user, setUser] = useState(() => {
@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
 
     const [loading, setLoading] = useState(true);
 
-    // بيتحقق من الـ token مع السيرفر كل ما الـ token يتغير (أو أول ما الصفحة تفتح)
+
     useEffect(() => {
         const fetchUser = async () => {
             if (!token) {
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
         fetchUser();
     }, [token]);
 
-    // تسجيل الدخول بالاتصال بالـ API مباشرة (email/password)
+    
     const loginContext = useCallback(async (email, password) => {
         const response = await loginApi({ email, password });
         const newToken = response.data.token;
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
         return response;
     }, []);
 
-    // تسجيل الدخول لما الـ token والـ user يكونوا جاهزين مسبقًا (مثلاً بعد OAuth)
+    
     const loginSuccess = useCallback((newToken, userData) => {
         localStorage.setItem("token", newToken);
         if (userData) localStorage.setItem("user", JSON.stringify(userData));
@@ -75,7 +75,7 @@ export const AuthProvider = ({ children }) => {
         setUser(userData || null);
     }, []);
 
-    // تحديث جزء من بيانات المستخدم (مثلاً عنوان جديد) من غير إعادة تسجيل دخول
+
     const updateUser = useCallback((partial) => {
         setUser((prev) => {
             const next = { ...(prev || {}), ...partial };
@@ -84,7 +84,7 @@ export const AuthProvider = ({ children }) => {
         });
     }, []);
 
-    // تسجيل الخروج: بيبلغ السيرفر ثم يمسح الحالة المحلية بغض النظر عن نتيجة الـ API
+    
     const logoutContext = useCallback(async () => {
         try {
             await logoutApi();
@@ -117,14 +117,14 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-// Hook جاهز لاستخدام الـ Auth في أي مكان بسهولة
+
 export function useAuth() {
     const ctx = useContext(AuthContext);
     if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
     return ctx;
 }
 
-// Hook لحماية المسارات والأزرار التي تتطلب تسجيل دخول مسبق
+
 export function useRequireAuth() {
     const { isLoggedIn } = useAuth();
     const navigate = useNavigate();

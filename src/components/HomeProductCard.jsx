@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Heart, Star, ShoppingBag, ImageOff } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { AddItemToCard } from "../api/cartsApi";
+import { AddItemToCard, getMyCart } from "../api/cartsApi";
 import { addToWishlist, removeFromWishlist, getMyWishlist } from "../api/wishlistApi";
 
 export default function HomeProductCard({ product }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isInCart, setIsInCart] = useState(false);
   const [loadingCart, setLoadingCart] = useState(false);
   const [loadingWishlist, setLoadingWishlist] = useState(false);
 
@@ -50,6 +51,36 @@ export default function HomeProductCard({ product }) {
     };
   }, [productId]);
 
+  useEffect(() => {
+    let isMounted = true;
+    const checkCartStatus = async () => {
+      try {
+        const cartRes = await getMyCart();
+        const cartItems = cartRes?.data?.items || [];
+
+        const exists = cartItems.some((item) => {
+          const itemId =
+            item.productId ||
+            (typeof item.product === "string" ? item.product : item.product?._id) ||
+            item._id ||
+            item.id;
+          return String(itemId) === String(productId);
+        });
+
+        if (isMounted) setIsInCart(exists);
+      } catch (error) {
+      }
+    };
+
+    if (productId) {
+      checkCartStatus();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [productId]);
+
   const handleWishlistClick = async (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -80,11 +111,33 @@ export default function HomeProductCard({ product }) {
     e.preventDefault();
     e.stopPropagation();
 
-    if (isOutOfStock) return;
+    if (isOutOfStock || isInCart) return;
 
     try {
       setLoadingCart(true);
+
+      const cartRes = await getMyCart();
+      const cartItems = cartRes?.data?.items || [];
+
+      const alreadyInCart = cartItems.some((item) => {
+        const itemId =
+          item.productId ||
+          (typeof item.product === "string" ? item.product : item.product?._id) ||
+          item._id ||
+          item.id;
+        return String(itemId) === String(productId);
+      });
+
+      if (alreadyInCart) {
+        setIsInCart(true);
+        toast.info(
+          "This product is already in your cart. Go to your cart to update the quantity.",
+        );
+        return;
+      }
+
       await AddItemToCard({ productId: productId, quantity: 1 });
+      setIsInCart(true);
       toast.success("Product added to cart successfully!");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to add to cart");
@@ -195,9 +248,9 @@ export default function HomeProductCard({ product }) {
         <button
           type="button"
           onClick={handleAddToCart}
-          disabled={loadingCart || isOutOfStock}
+          disabled={loadingCart || isOutOfStock || isInCart}
+          aria-label={isInCart ? "Already in cart" : "Add to cart"}
           className="rounded-full bg-[#5C422B] p-2.5 text-[#EBE8E5] shadow-md transition-all hover:bg-[#3D342B] hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50 dark:bg-[#BAAB9A] dark:text-[#1C1713] dark:hover:bg-[#EDD4C1]"
-          aria-label="Add to cart"
         >
           <ShoppingBag className="h-3.5 w-3.5" />
         </button>
